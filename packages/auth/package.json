@@ -1,0 +1,30 @@
+{
+  "name": "@paystay/auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node ../../scripts/fix-esm-specifiers.mjs dist",
+    "check-types": "tsc -p tsconfig.json --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^22.19.15",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@paystay/db": "*",
+    "better-auth": "^1.5.5"
+  }
+}
