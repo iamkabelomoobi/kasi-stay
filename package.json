@@ -1,0 +1,25 @@
+{
+  "name": "paystay",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "start:server": "npm run build && node --experimental-specifier-resolution=node apps/server/dist/index.js",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
+  },
+  "devDependencies": {
+    "prettier": "^3.7.4",
+    "turbo": "^2.8.20",
+    "typescript": "5.9.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "npm@11.3.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
