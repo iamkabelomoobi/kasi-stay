@@ -32,7 +32,7 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@apollo/server": "^5.4.0",
+    "@apollo/server": "^5.5.0",
     "@as-integrations/express4": "^1.1.2",
     "@paystay/logger": "^1.0.0",
     "@faker-js/faker": "^10.3.0",
