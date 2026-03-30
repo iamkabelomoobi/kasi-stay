@@ -1,9 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma } from "@paystay/db";
+import { prisma, Prisma } from "@paystay/db";
 import { sendEmail, authenticationTemplates } from "@paystay/email";
 import { logger } from "@paystay/logger";
-import { UserRole } from "@paystay/db";
 import { createRoleRecord } from "../utils/create-role-record";
 
 const appName = process.env.APP_NAME || "PayStay";
@@ -16,7 +15,7 @@ type AuthUser = {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
+  role: Prisma.Prisma.UserRole;
 };
 
 const sendWelcomeEmail = async (user: AuthUser): Promise<void> => {
@@ -70,7 +69,7 @@ export const auth = betterAuth({
       role: {
         type: "string",
         required: false,
-        defaultValue: UserRole.CUSTOMER,
+        defaultValue: Prisma.UserRole.CUSTOMER,
       },
     },
   },
@@ -79,7 +78,7 @@ export const auth = betterAuth({
       create: {
         after: async (user) => {
           try {
-            const safeRole = UserRole.CUSTOMER;
+            const safeRole = Prisma.UserRole.CUSTOMER;
 
             if (user.role !== safeRole) {
               logger.warn(
@@ -99,6 +98,12 @@ export const auth = betterAuth({
             });
             await createRoleRecord({
               ...user,
+              role: safeRole,
+            });
+            await sendWelcomeEmail({
+              id: user.id,
+              name: user.name,
+              email: user.email,
               role: safeRole,
             });
           } catch (error) {

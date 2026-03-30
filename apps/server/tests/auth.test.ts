@@ -25,6 +25,7 @@ if (!runIntegrationTests) {
     const email = `${harness.runId}-signup@example.com`;
     const password = "Passw0rd!123";
     const cookieJar: Record<string, string> = {};
+    const initialEmailCount = harness.sentEmails.length;
 
     const signUp = await harness.jsonRequest(
       "/api/auth/sign-up/email",
@@ -52,6 +53,10 @@ if (!runIntegrationTests) {
     });
 
     assert.ok(customerProfile);
+    const welcomeEmail = harness.sentEmails[harness.sentEmails.length - 1];
+    assert.equal(harness.sentEmails.length, initialEmailCount + 1);
+    assert.equal(welcomeEmail?.to, email);
+    assert.match(welcomeEmail?.subject ?? "", /welcome/i);
   });
 
   test("auth sign-in and sign-out endpoints manage session cookies", { concurrency: false }, async () => {

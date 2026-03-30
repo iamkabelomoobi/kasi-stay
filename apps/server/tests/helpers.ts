@@ -1,35 +1,18 @@
 import assert from "node:assert/strict";
+import type { PrismaClient, UserRole } from "@paystay/db";
 
 type Runtime = {
   start: (port?: number) => Promise<number>;
   stop: (reason?: string) => Promise<void>;
 };
 
-type PrismaClient = {
-  user: {
-    findUnique: (args: Record<string, unknown>) => Promise<any>;
-    update: (args: Record<string, unknown>) => Promise<any>;
-    deleteMany: (args: Record<string, unknown>) => Promise<any>;
-  };
-  admin: {
-    findUnique: (args: Record<string, unknown>) => Promise<any>;
-  };
-  customer: {
-    findUnique: (args: Record<string, unknown>) => Promise<any>;
-  };
-  $disconnect: () => Promise<void>;
-};
-
 type AuthApi = {
-  signUpEmail: (args: { body: { email: string; password: string; name: string } }) => Promise<unknown>;
+  signUpEmail: (args: {
+    body: { email: string; password: string; name: string };
+  }) => Promise<unknown>;
 };
 
-type RoleRecordCreator = (user: { id: string; role: string }) => Promise<void>;
-
-type UserRoleMap = {
-  ADMIN: string;
-  CUSTOMER: string;
-};
+type RoleRecordCreator = (user: { id: string; role: UserRole }) => Promise<void>;
 
 export type CookieJar = Record<string, string>;
 
@@ -37,10 +20,17 @@ export type FixtureUser = {
   email: string;
   password: string;
   name: string;
-  role: string;
+  role: UserRole;
   userId: string;
   adminId?: string;
   customerId?: string;
+};
+
+export type CapturedEmail = {
+  to: string | string[];
+  subject: string;
+  html?: string;
+  text?: string;
 };
 
 export type IntegrationHarness = Awaited<
@@ -71,9 +61,11 @@ const parseJson = async (response: Response): Promise<any> => {
 };
 
 const updateCookieJar = (jar: CookieJar, response: Response): CookieJar => {
-  const getSetCookie = (response.headers as Headers & {
-    getSetCookie?: () => string[];
-  }).getSetCookie;
+  const getSetCookie = (
+    response.headers as Headers & {
+      getSetCookie?: () => string[];
+    }
+  ).getSetCookie;
 
   const setCookies = getSetCookie ? getSetCookie.call(response.headers) : [];
 
@@ -104,16 +96,36 @@ const cookieHeader = (jar: CookieJar): string =>
 export const createIntegrationHarness = async () => {
   applyTestEnv();
 
-  const [{ createServerRuntime }, dbModule, authModule] = await Promise.all([
-    import("../src/app/server.ts"),
-    import("@paystay/db"),
-    import("@paystay/auth"),
-  ]);
+  const [{ createServerRuntime }, dbModule, authModule, emailModule] =
+    await Promise.all([
+      import("../src/app/server"),
+      import("@paystay/db"),
+      import("@paystay/auth"),
+      import("@paystay/email"),
+    ]);
 
-  const prisma = dbModule.prisma as PrismaClient;
-  const UserRole = dbModule.UserRole as UserRoleMap;
+  const prisma: PrismaClient = dbModule.prisma;
+  const userRole = dbModule.UserRole;
   const auth = authModule.auth as { api: AuthApi };
   const createRoleRecord = authModule.createRoleRecord as RoleRecordCreator;
+  const sentEmails: CapturedEmail[] = [];
+  const mailer = emailModule.getNodemailerClient() as {
+    sendMail: (message: CapturedEmail) => Promise<{ messageId: string }>;
+  };
+  const originalSendMail = mailer.sendMail.bind(mailer);
+
+  mailer.sendMail = async (message) => {
+    sentEmails.push({
+      to: message.to,
+      subject: message.subject,
+      html: message.html,
+      text: message.text,
+    });
+
+    return {
+      messageId: `test-message-${sentEmails.length}`,
+    };
+  };
 
   const runtime = (await createServerRuntime()) as Runtime;
   const port = await runtime.start(0);
@@ -177,7 +189,9 @@ export const createIntegrationHarness = async () => {
     return jsonRequest("/graphql", { query, variables }, jar);
   };
 
-  const createFixtureUser = async (role: keyof UserRoleMap): Promise<FixtureUser> => {
+  const createFixtureUser = async (
+    role: keyof typeof userRole,
+  ): Promise<FixtureUser> => {
     const suffix = Math.random().toString(36).slice(2, 8);
     const email = `${runId}-${role.toLowerCase()}-${suffix}@example.com`;
     const password = "Passw0rd!123";
@@ -196,12 +210,12 @@ export const createIntegrationHarness = async () => {
     const user = await prisma.user.update({
       where: { id: createdUser.id },
       data: {
-        role: UserRole[role],
+        role: userRole[role],
         emailVerified: true,
       },
     });
 
-    await createRoleRecord({ id: user.id, role: UserRole[role] });
+    await createRoleRecord({ id: user.id, role: userRole[role] });
 
     const adminProfile =
       role === "ADMIN"
@@ -216,14 +230,17 @@ export const createIntegrationHarness = async () => {
       email,
       password,
       name,
-      role: UserRole[role],
+      role: userRole[role],
       userId: user.id,
       adminId: adminProfile?.id,
       customerId: customerProfile?.id,
     };
   };
 
-  const signIn = async (email: string, password: string): Promise<CookieJar> => {
+  const signIn = async (
+    email: string,
+    password: string,
+  ): Promise<CookieJar> => {
     const jar: CookieJar = {};
     const { response, body } = await jsonRequest(
       "/api/auth/sign-in/email",
@@ -244,6 +261,7 @@ export const createIntegrationHarness = async () => {
       },
     });
 
+    mailer.sendMail = originalSendMail;
     await runtime.stop("tests");
     await prisma.$disconnect();
   };
@@ -258,7 +276,8 @@ export const createIntegrationHarness = async () => {
     prisma,
     request,
     runId,
+    sentEmails,
     signIn,
-    userRole: UserRole,
+    userRole,
   };
 };
