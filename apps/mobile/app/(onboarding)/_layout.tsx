@@ -5,8 +5,8 @@ const OnboardingLayout = () => {
     <Stack
       screenOptions={{
         headerShown: false,
-        animation: "fade",
-        contentStyle: { backgroundColor: "#050505" },
+        animation: "slide_from_right",
+        contentStyle: { backgroundColor: "#EEF4FB" },
       }}
     />
   );

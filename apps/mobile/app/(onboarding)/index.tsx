@@ -45,7 +45,7 @@ const OnboardingScreen = () => {
 
             <Pressable
               accessibilityRole="button"
-              onPress={() => router.replace("/")}
+              onPress={() => router.replace("/login")}
               style={({ pressed }) => [
                 styles.cta,
                 pressed && styles.ctaPressed,
