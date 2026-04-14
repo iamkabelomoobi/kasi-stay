@@ -2,7 +2,7 @@ import "dotenv/config";
 import nodemailer, { type Transporter } from "nodemailer";
 import { Resend } from "resend";
 import { EmailPayload } from "../templates/auth/auth-types";
-import { logger } from "@paystay/logger";
+import { logger } from "@kasistay/logger";
 
 let resendClient: Resend | null = null;
 let nodemailerClient: Transporter | null = null;
@@ -28,7 +28,7 @@ const extractEmailAddress = (value: string): string | null => {
 
 const normalizeEnvelopeSender = (
   value: string,
-  fallbackDomain = "paystay.local",
+  fallbackDomain = "kasistay.local",
 ): string => {
   const extracted = extractEmailAddress(value);
   if (extracted) return extracted;
@@ -76,7 +76,7 @@ export const sendEmail = async (payload: EmailPayload): Promise<void> => {
   if (useMailhog) {
     const client = getNodemailerClient();
     const configuredFrom =
-      process.env.MAILHOG_FROM?.trim() || "PayStay <no-reply@paystay.local>";
+      process.env.MAILHOG_FROM?.trim() || "kasistay <no-reply@kasistay.local>";
     const envelopeFrom = normalizeEnvelopeSender(configuredFrom);
 
     if (!extractEmailAddress(configuredFrom)) {

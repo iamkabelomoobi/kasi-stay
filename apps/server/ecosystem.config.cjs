@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "paystay-server",
+      name: "server",
       script: "./dist/index.js",
       cwd: __dirname,
       instances: "max",

@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import { mock, test } from "node:test";
 
 test("signup post-processing sends a welcome email after provisioning the customer role", async () => {
-  process.env.APP_NAME = "PayStay Test";
+  process.env.APP_NAME = "kasistay Test";
 
   const sendEmailCalls: Array<Record<string, unknown>> = [];
   const userUpdates: Array<Record<string, unknown>> = [];
   const customerUpserts: Array<Record<string, unknown>> = [];
 
-  mock.module("@paystay/db", {
+  mock.module("@kasistay/db", {
     namedExports: {
       prisma: {
         user: {
@@ -34,7 +34,7 @@ test("signup post-processing sends a welcome email after provisioning the custom
     },
   });
 
-  mock.module("@paystay/email", {
+  mock.module("@kasistay/email", {
     namedExports: {
       sendEmail: async (payload: Record<string, unknown>) => {
         sendEmailCalls.push(payload);
@@ -70,7 +70,7 @@ test("signup post-processing sends a welcome email after provisioning the custom
     },
   });
 
-  mock.module("@paystay/logger", {
+  mock.module("@kasistay/logger", {
     namedExports: {
       logger: {
         warn: () => undefined,

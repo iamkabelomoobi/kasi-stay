@@ -1,5 +1,5 @@
 import { Context } from "../../../app/context";
-import { Prisma } from "@paystay/db";
+import { Prisma } from "@kasistay/db";
 
 export const deleteAdmin = async (
   id: string,

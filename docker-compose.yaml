@@ -1,25 +1,25 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: paystay-postgres-dev
+    container_name: kasistay-postgres-dev
     restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: paystay
-      POSTGRES_PASSWORD: paystay
-      POSTGRES_DB: paystay_dev
+      POSTGRES_USER: kasistay
+      POSTGRES_PASSWORD: kasistay
+      POSTGRES_DB: kasistay_dev
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U paystay -d paystay_dev"]
+      test: ["CMD-SHELL", "pg_isready -U kasistay -d kasistay_dev"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   mailhog:
     image: mailhog/mailhog
-    container_name: paystay-mailhog-dev
+    container_name: kasistay-mailhog-dev
     restart: unless-stopped
     ports:
       - "1025:1025"
@@ -36,4 +36,4 @@ volumes:
 
 networks:
   default:
-    name: paystay-network
+    name: kasistay-network

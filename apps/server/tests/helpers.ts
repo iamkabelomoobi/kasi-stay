@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import type { PrismaClient, UserRole } from "@paystay/db";
+import type { PrismaClient, UserRole } from "@kasistay/db";
 
 type Runtime = {
   start: (port?: number) => Promise<number>;
@@ -41,12 +41,12 @@ export const runIntegrationTests =
   process.env.RUN_SERVER_INTEGRATION_TESTS === "1";
 
 const defaultDatabaseUrl =
-  "postgresql://paystay:paystay@127.0.0.1:5432/paystay_dev";
+  "postgresql://kasistay:kasistay@127.0.0.1:5432/kasistay_dev";
 
 const applyTestEnv = (): void => {
   process.env.NODE_ENV ??= "test";
   process.env.DATABASE_URL ??= defaultDatabaseUrl;
-  process.env.APP_NAME ??= "PayStay Test";
+  process.env.APP_NAME ??= "kasistay Test";
   process.env.FRONTEND_URL ??= "http://localhost:3000";
   process.env.ADMIN_URL ??= "http://localhost:3001";
   process.env.CUSTOMER_URL ??= "http://localhost:3000";
@@ -99,9 +99,9 @@ export const createIntegrationHarness = async () => {
   const [{ createServerRuntime }, dbModule, authModule, emailModule] =
     await Promise.all([
       import("../src/app/server"),
-      import("@paystay/db"),
-      import("@paystay/auth"),
-      import("@paystay/email"),
+      import("@kasistay/db"),
+      import("@kasistay/auth"),
+      import("@kasistay/email"),
     ]);
 
   const prisma: PrismaClient = dbModule.prisma;

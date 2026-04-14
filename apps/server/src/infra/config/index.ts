@@ -32,7 +32,7 @@ export const config = {
       port: parseInt(process.env.MAILHOG_PORT || "1025", 10),
       secure: process.env.MAILHOG_SECURE === "true",
       from:
-        process.env.MAILHOG_FROM || "PayStay <no-reply@paystay.local>",
+        process.env.MAILHOG_FROM || "kasistay <no-reply@kasistay.local>",
       auth:
         process.env.MAILHOG_USER && process.env.MAILHOG_PASS
           ? {

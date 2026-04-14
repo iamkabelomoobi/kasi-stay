@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { connectDatabase, disconnectDatabase } from "@paystay/db";
-import { logger } from "@paystay/logger";
+import { connectDatabase, disconnectDatabase } from "@kasistay/db";
+import { logger } from "@kasistay/logger";
 import { startQueueWorker } from "../queue/client";
 import { registerAuthProcessors } from "./processors";
 

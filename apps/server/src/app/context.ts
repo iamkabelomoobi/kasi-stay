@@ -1,7 +1,7 @@
-import { auth, getBetterAuthHeaders } from "@paystay/auth";
-import { prisma } from "@paystay/db";
-import { UserRole } from "@paystay/db";
-import { logger } from "@paystay/logger";
+import { auth, getBetterAuthHeaders } from "@kasistay/auth";
+import { prisma } from "@kasistay/db";
+import { UserRole } from "@kasistay/db";
+import { logger } from "@kasistay/logger";
 import { Request } from "express";
 
 type SessionUser = {

@@ -1,5 +1,5 @@
 {
-  "name": "@paystay/email",
+  "name": "@kasistay/email",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
@@ -20,8 +20,8 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@paystay/db": "*",
-    "@paystay/logger": "^1.0.0",
+    "@kasistay/db": "*",
+    "@kasistay/logger": "^1.0.0",
     "mailgen": "^2.0.28",
     "nodemailer": "^6.9.0",
     "resend": "^4.0.0"

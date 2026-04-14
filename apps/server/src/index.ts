@@ -1,4 +1,4 @@
-import { disconnectDatabase } from "@paystay/db";
+import { disconnectDatabase } from "@kasistay/db";
 import { pathToFileURL } from "node:url";
 import { createServerRuntime } from "./app/server";
 import { seedAdmin } from "./infra";

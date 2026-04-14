@@ -7,7 +7,7 @@ export const getMailgenInstance = (_theme: string = "default"): Mailgen => {
     instance = new Mailgen({
       theme: "default",
       product: {
-        name: "PayStay",
+        name: "kasistay",
         link: process.env.FRONTEND_URL || "http://localhost:3000",
       },
     });

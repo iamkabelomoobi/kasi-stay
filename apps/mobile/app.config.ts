@@ -5,12 +5,12 @@ const IS_PREVIEW = process.env.APP_VARIANT === "preview";
 
 const getUniqueIdentifier = () => {
   if (IS_DEV) {
-    return "com.paystay.dev";
+    return "com.kasistay.dev";
   }
   if (IS_PREVIEW) {
-    return "com.paystay.preview";
+    return "com.kasistay.preview";
   }
-  return "com.paystay";
+  return "com.kasistay";
 };
 
 const getAppName = () => {
@@ -27,11 +27,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
 
   name: getAppName(),
-  slug: "paystay",
+  slug: "kasistay",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
-  scheme: "paystay",
+  scheme: "kasistay",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
 

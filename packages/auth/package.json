@@ -1,5 +1,5 @@
 {
-  "name": "@paystay/auth",
+  "name": "@kasistay/auth",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
@@ -24,7 +24,7 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@paystay/db": "*",
+    "@kasistay/db": "*",
     "better-auth": "^1.5.5"
   }
 }

@@ -10,7 +10,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between gap-4">
         <div className="shrink-0">
           <h1 className="text-xl font-black tracking-[0.3em] text-white sm:text-2xl">
-            PAYSTAY
+            kasistay
           </h1>
         </div>
 

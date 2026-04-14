@@ -1,5 +1,5 @@
-import { auth, createRoleRecord } from "@paystay/auth";
-import { prisma, UserRole } from "@paystay/db";
+import { auth, createRoleRecord } from "@kasistay/auth";
+import { prisma, UserRole } from "@kasistay/db";
 import { pathToFileURL } from "node:url";
 
 export const seedAdmin = async () => {

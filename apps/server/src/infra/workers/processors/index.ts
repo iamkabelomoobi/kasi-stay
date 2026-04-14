@@ -9,7 +9,7 @@ import {
   AuthWelcomeEmailPayload,
 } from "../../../modules/auth/jobs";
 import { registerQueueProcessor } from "../../queue/registry";
-import { sendEmail, authenticationTemplates } from "@paystay/email";
+import { sendEmail, authenticationTemplates } from "@kasistay/email";
 
 const processPasswordResetOtp = async (
   payload: AuthPasswordResetOtpPayload,

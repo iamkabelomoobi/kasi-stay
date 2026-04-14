@@ -1,14 +1,14 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma, Prisma } from "@paystay/db";
-import { sendEmail, authenticationTemplates } from "@paystay/email";
-import { logger } from "@paystay/logger";
+import { prisma, Prisma } from "@kasistay/db";
+import { sendEmail, authenticationTemplates } from "@kasistay/email";
+import { logger } from "@kasistay/logger";
 import { createRoleRecord } from "../utils/create-role-record";
 
-const appName = process.env.APP_NAME || "PayStay";
+const appName = process.env.APP_NAME || "kasistay";
 
 if (!process.env.APP_NAME) {
-  logger.warn("APP_NAME is not set, using default: PayStay");
+  logger.warn("APP_NAME is not set, using default: kasistay");
 }
 
 type AuthUser = {

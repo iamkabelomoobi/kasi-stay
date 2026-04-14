@@ -4,7 +4,7 @@ import {
   PasswordResetTemplateParams,
   PasswordUpdateTemplateParams,
   WelcomeTemplateParams,
-} from "@paystay/email";
+} from "@kasistay/email";
 
 export const AUTH_PASSWORD_RESET_OTP_JOB =
   "auth.passwordResetOtpEmail" as const;

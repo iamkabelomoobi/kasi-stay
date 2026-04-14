@@ -8,7 +8,7 @@ const Hero = () => {
     <section className="relative min-h-screen overflow-hidden">
       <Image
         src="/bg/hero.jpg"
-        alt="PayStay property booking background"
+        alt="kasistay property booking background"
         fill
         priority
         quality={100}

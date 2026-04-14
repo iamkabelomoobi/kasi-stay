@@ -7,7 +7,7 @@ export const Footer = () => {
         <div className="flex flex-col items-center text-center">
           <div>
             <h2 className="text-2xl font-black tracking-[0.3em] text-white sm:text-3xl">
-              PAYSTAY
+              kasistay
             </h2>
           </div>
 
@@ -69,7 +69,7 @@ export const Footer = () => {
             <a href="#" className="transition hover:text-white">
               Terms &amp; Conditions
             </a>
-            <p>© PayStay | All Rights Reserved.</p>
+            <p>© kasistay | All Rights Reserved.</p>
             <a href="#" className="transition hover:text-white">
               Privacy Policy
             </a>

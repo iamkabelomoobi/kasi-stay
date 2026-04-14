@@ -1,4 +1,4 @@
-import { logger } from "@paystay/logger";
+import { logger } from "@kasistay/logger";
 import { config } from "../config";
 import { getQueueProcessor } from "./registry";
 import {

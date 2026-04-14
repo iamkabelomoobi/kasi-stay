@@ -1,5 +1,5 @@
 import { IncomingHttpHeaders } from "http";
-import { getBetterAuthHeaders, auth } from "@paystay/auth";
+import { getBetterAuthHeaders, auth } from "@kasistay/auth";
 
 export type Session = Awaited<ReturnType<typeof auth.api.getSession>>;
 

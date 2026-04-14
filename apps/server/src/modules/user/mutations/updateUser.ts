@@ -1,5 +1,5 @@
 import { Context } from "../../../app/context";
-import { Prisma } from "@paystay/db";
+import { Prisma } from "@kasistay/db";
 
 export const updateUser = async (
   id: string,
