@@ -6,12 +6,21 @@
     "start:server": "npm run build && node --experimental-specifier-resolution=node apps/server/dist/index.js",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "lint:apps": "npm run lint --workspace web && npm run lint --workspace @kasistay/server && npm run lint --workspace mobile",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md}\"",
+    "format:check:apps": "prettier --check \"apps/**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md}\"",
+    "check-types": "turbo run check-types",
+    "docker:dev": "docker compose --env-file .env -f docker-compose.dev.yml up -d",
+    "docker:prod": "docker compose --env-file .env -f docker-compose.prod.yml up -d --build",
+    "docker:down": "docker compose -f docker-compose.dev.yml down && docker compose -f docker-compose.prod.yml down"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "eslint": "^9.39.4",
+    "globals": "^14.0.0",
     "prettier": "^3.7.4",
     "turbo": "^2.8.20",
+    "typescript-eslint": "^8.58.0",
     "typescript": "5.9.2"
   },
   "engines": {

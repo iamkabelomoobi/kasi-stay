@@ -1,0 +1,16 @@
+.codex
+.git
+.next
+.turbo
+.vercel
+coverage
+dist
+build
+node_modules
+package-lock.json
+
+apps/mobile/.expo
+apps/mobile/android
+apps/mobile/ios
+
+packages/db/generated
