@@ -1,6 +1,6 @@
 import { Context } from "../../../app/context";
 
-export const getCustomers = async (
+export const getRenters = async (
   ctx: Context,
   query?: object,
   search?: { name?: string | null; email?: string | null },
@@ -23,7 +23,7 @@ export const getCustomers = async (
     });
   }
 
-  return ctx.prisma.customer.findMany({
+  return ctx.prisma.renter.findMany({
     ...(query ?? {}),
     ...(orFilters.length > 0
       ? {

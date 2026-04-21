@@ -1,21 +1,17 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma, Prisma } from "@kasistay/db";
+import { prisma, UserRole } from "@kasistay/db";
 import { sendEmail, authenticationTemplates } from "@kasistay/email";
 import { logger } from "@kasistay/logger";
 import { createRoleRecord } from "../utils/create-role-record";
 
 const appName = process.env.APP_NAME || "kasistay";
 
-if (!process.env.APP_NAME) {
-  logger.warn("APP_NAME is not set, using default: kasistay");
-}
-
 type AuthUser = {
   id: string;
   name: string;
   email: string;
-  role: Prisma.Prisma.UserRole;
+  role: UserRole;
 };
 
 const sendWelcomeEmail = async (user: AuthUser): Promise<void> => {
@@ -69,7 +65,7 @@ export const auth = betterAuth({
       role: {
         type: "string",
         required: false,
-        defaultValue: Prisma.UserRole.CUSTOMER,
+        defaultValue: UserRole.RENTER,
       },
     },
   },
@@ -78,11 +74,11 @@ export const auth = betterAuth({
       create: {
         after: async (user) => {
           try {
-            const safeRole = Prisma.UserRole.CUSTOMER;
+            const safeRole = UserRole.RENTER;
 
             if (user.role !== safeRole) {
               logger.warn(
-                `Rejected privileged signup role "${user.role}" for ${user.email}. Downgrading to CUSTOMER.`,
+                `Rejected privileged signup role "${user.role}" for ${user.email}. Downgrading to RENTER.`,
               );
             }
 

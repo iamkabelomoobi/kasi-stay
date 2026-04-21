@@ -45,7 +45,7 @@ if (!runIntegrationTests) {
 
     assert.equal(myProfile.response.status, 200);
     assert.equal(myProfile.body.errors, undefined);
-    assert.equal(myProfile.body.data.myProfile.id, customerFixture.customerId);
+    assert.equal(myProfile.body.data.myProfile.id, customerFixture.renterId);
     assert.equal(myProfile.body.data.myProfile.user.email, customerFixture.email);
 
     const updateProfile = await harness.graphql(
@@ -60,7 +60,7 @@ if (!runIntegrationTests) {
         }
       `,
       {
-        id: customerFixture.customerId,
+        id: customerFixture.renterId,
         input: {
           name: "customer-updated",
         },
@@ -71,13 +71,13 @@ if (!runIntegrationTests) {
     assert.equal(updateProfile.response.status, 200);
     assert.equal(updateProfile.body.errors, undefined);
     assert.equal(
-      updateProfile.body.data.updateCustomer.user.name,
+      updateProfile.body.data.user.name,
       "customer-updated",
     );
   });
 
   test("customer endpoints reject access to another customer's profile", { concurrency: false }, async () => {
-    const outsider = await harness.createFixtureUser("CUSTOMER");
+    const outsider = await harness.createFixtureUser("RENTER");
     const cookieJar = await harness.signIn(
       customerFixture.email,
       customerFixture.password,
@@ -91,7 +91,7 @@ if (!runIntegrationTests) {
           }
         }
       `,
-      { id: outsider.customerId },
+      { id: outsider.renterId },
       cookieJar,
     );
 

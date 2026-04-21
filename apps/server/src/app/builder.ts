@@ -15,7 +15,7 @@ export const builder = new SchemaBuilder<{
   AuthScopes: {
     isAuthenticated: boolean;
     isAdmin: boolean;
-    isCustomer: boolean;
+    isRenter: boolean;
   };
   PrismaTypes: PrismaTypes;
   Scalars: {
@@ -36,7 +36,7 @@ export const builder = new SchemaBuilder<{
     authScopes: (ctx) => ({
       isAuthenticated: ctx.isAuthenticated,
       isAdmin: ctx.isAdmin,
-      isCustomer: ctx.isCustomer,
+      isRenter: ctx.isRenter,
     }),
   },
   prisma: {

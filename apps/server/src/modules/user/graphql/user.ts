@@ -11,7 +11,7 @@ builder.prismaObject("User", {
     role: t.exposeString("role"),
     image: t.exposeString("image", { nullable: true }),
     admin: t.relation("admin", { nullable: true }),
-    customer: t.relation("customer", { nullable: true }),
+    renter: t.relation("renter", { nullable: true }),
   }),
 });
 
