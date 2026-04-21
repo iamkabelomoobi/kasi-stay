@@ -18,7 +18,14 @@ datasource db {
 
 enum UserRole {
   ADMIN
-  CUSTOMER
+  LANDLORD
+  RENTER
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
 }
 
 model User {
@@ -27,12 +34,13 @@ model User {
   email         String
   emailVerified Boolean  @default(false)
   image         String?
-  role          UserRole @default(CUSTOMER)
+  role          UserRole @default(RENTER)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   admin    Admin?
-  customer Customer?
+  landlord Landlord?
+  renter   Renter?
 
   sessions Session[]
   accounts Account[]
@@ -102,7 +110,20 @@ model Admin {
   @@map("admin")
 }
 
-model Customer {
+model Landlord {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @default(now()) @updatedAt
+
+  @@index([userId])
+  @@map("landlord")
+}
+
+model Renter {
   id        String   @id @default(cuid())
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -110,5 +131,5 @@ model Customer {
   updatedAt DateTime @default(now()) @updatedAt
 
   @@index([userId])
-  @@map("customer")
+  @@map("renter")
 }

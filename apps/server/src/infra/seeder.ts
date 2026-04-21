@@ -58,59 +58,59 @@ export const seedAdmin = async () => {
   }
 };
 
-export const seedCustomer = async () => {
-  const customerEmail = process.env.CUSTOMER_EMAIL ?? "customer@example.com";
-  const customerName = process.env.CUSTOMER_NAME ?? "Sample Customer";
-  const customerPassword = process.env.CUSTOMER_PASSWORD ?? "customer123";
+export const seedrenter = async () => {
+  const renterEmail = process.env.renter_EMAIL ?? "renter@example.com";
+  const renterName = process.env.renter_NAME ?? "Sample renter";
+  const renterPassword = process.env.renter_PASSWORD ?? "renter123";
 
   try {
     const existingUser = await prisma.user.findUnique({
-      where: { email: customerEmail },
+      where: { email: renterEmail },
     });
 
     if (existingUser) {
-      console.log(`[seeder] Customer user ${customerEmail} already exists.`);
-      const existingCustomer = await prisma.customer.findUnique({
+      console.log(`[seeder] renter user ${renterEmail} already exists.`);
+      const existingrenter = await prisma.renter.findUnique({
         where: { userId: existingUser.id },
       });
-      if (!existingCustomer) {
-        await prisma.customer.create({ data: { userId: existingUser.id } });
+      if (!existingrenter) {
+        await prisma.renter.create({ data: { userId: existingUser.id } });
         console.log(
-          `[seeder] Created missing customer profile for ${customerEmail}.`,
+          `[seeder] Created missing renter profile for ${renterEmail}.`,
         );
       }
-      return await prisma.customer.findUnique({
+      return await prisma.renter.findUnique({
         where: { userId: existingUser.id },
       });
     }
 
-    console.log(`[seeder] Creating customer user: ${customerEmail}`);
+    console.log(`[seeder] Creating renter user: ${renterEmail}`);
 
     await auth.api.signUpEmail({
       body: {
-        email: customerEmail,
-        password: customerPassword,
-        name: customerName,
+        email: renterEmail,
+        password: renterPassword,
+        name: renterName,
       },
     });
 
     const user = await prisma.user.update({
-      where: { email: customerEmail },
-      data: { role: UserRole.CUSTOMER, emailVerified: true },
+      where: { email: renterEmail },
+      data: { role: UserRole.RENTER, emailVerified: true },
     });
 
-    await createRoleRecord({ id: user.id, role: UserRole.CUSTOMER });
+    await createRoleRecord({ id: user.id, role: UserRole.RENTER });
 
-    const customerProfile = await prisma.customer.upsert({
+    const renterProfile = await prisma.renter.upsert({
       where: { userId: user.id },
       update: {},
       create: { userId: user.id },
     });
 
-    console.log(`[seeder] Customer user and profile created successfully.`);
-    return customerProfile;
+    console.log(`[seeder] renter user and profile created successfully.`);
+    return renterProfile;
   } catch (error: any) {
-    console.warn(`[seeder] Customer seeding information: ${error.message}`);
+    console.warn(`[seeder] renter seeding information: ${error.message}`);
   }
 };
 
@@ -119,8 +119,8 @@ const main = async () => {
   const adminProfile = await seedAdmin();
   if (!adminProfile) throw new Error("[seeder] Failed to seed admin.");
 
-  const customerProfile = await seedCustomer();
-  if (!customerProfile) throw new Error("[seeder] Failed to seed customer.");
+  const renterProfile = await seedrenter();
+  if (!renterProfile) throw new Error("[seeder] Failed to seed renter.");
 
 };
 

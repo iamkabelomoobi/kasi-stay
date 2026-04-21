@@ -37,7 +37,7 @@ export class Context {
   }
 
   get role(): UserRole {
-    return (this.session?.user?.role as UserRole) ?? UserRole.CUSTOMER;
+    return (this.session?.user?.role as UserRole) ?? UserRole.RENTER;
   }
 
   get isAuthenticated(): boolean {
@@ -48,8 +48,8 @@ export class Context {
     return this.role === UserRole.ADMIN;
   }
 
-  get isCustomer(): boolean {
-    return this.role === UserRole.CUSTOMER;
+  get isRenter(): boolean {
+    return this.role === UserRole.RENTER;
   }
 
   assertAuth(): SessionUser {
@@ -67,10 +67,10 @@ export class Context {
     return user;
   }
 
-  assertCustomer(): SessionUser {
+  assertRenter(): SessionUser {
     const user = this.assertAuth();
-    if (!this.isCustomer) {
-      throw new Error("Forbidden: customer access required");
+    if (!this.isRenter) {
+      throw new Error("Forbidden: renter access required");
     }
     return user;
   }

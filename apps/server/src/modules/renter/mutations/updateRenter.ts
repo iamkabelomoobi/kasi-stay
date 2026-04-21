@@ -1,7 +1,7 @@
 import { Context } from "../../../app/context";
 import { Prisma } from "@kasistay/db";
 
-export const updateCustomer = async (
+export const updateRenter = async (
   id: string,
   data: { name?: string; email?: string; image?: string },
   ctx: Context,
@@ -10,7 +10,7 @@ export const updateCustomer = async (
 ) => {
   const db = transaction ?? ctx.prisma;
 
-  return db.customer.update({
+  return db.renter.update({
     ...(query ?? {}),
     where: { id },
     data: {

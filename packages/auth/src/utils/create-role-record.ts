@@ -1,41 +1,51 @@
-import { prisma, UserRole } from "@kasistay/db";
+import { prisma, UserRole, VerificationStatus } from "@kasistay/db";
 
 export type AuthHookUser = {
   id: string;
   role?: unknown;
-  name?: unknown;
-  email?: unknown;
 };
 
 const asUserRole = (role: unknown): UserRole => {
-  if (role === UserRole.ADMIN || role === UserRole.CUSTOMER) {
-    return role;
-  }
-  return UserRole.CUSTOMER;
+  return Object.values(UserRole).includes(role as UserRole)
+    ? (role as UserRole)
+    : UserRole.RENTER;
 };
 
 export const createRoleRecord = async (user: AuthHookUser): Promise<void> => {
   const role = asUserRole(user.role);
 
-  if (role === UserRole.ADMIN) {
-    await prisma.admin.upsert({
-      where: { userId: user.id },
-      update: {},
-      create: {
-        userId: user.id,
-      },
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: user.id },
+      data: { role },
     });
-    return;
-  }
 
-  if (role === UserRole.CUSTOMER) {
-    await prisma.customer.upsert({
-      where: { userId: user.id },
-      update: {},
-      create: {
-        userId: user.id,
-      },
-    });
-    return;
-  }
+    await tx.admin.deleteMany({ where: { userId: user.id } });
+    await tx.landlord.deleteMany({ where: { userId: user.id } });
+    await tx.renter.deleteMany({ where: { userId: user.id } });
+
+    switch (role) {
+      case UserRole.ADMIN:
+        await tx.admin.create({
+          data: { userId: user.id },
+        });
+        break;
+
+      case UserRole.LANDLORD:
+        await tx.landlord.create({
+          data: {
+            userId: user.id,
+            verificationStatus: VerificationStatus.PENDING,
+          },
+        });
+        break;
+
+      case UserRole.RENTER:
+      default:
+        await tx.renter.create({
+          data: { userId: user.id },
+        });
+        break;
+    }
+  });
 };

@@ -1,21 +1,21 @@
 import "dotenv/config";
 
 const adminUrl = process.env.ADMIN_URL || "http://localhost:3001";
-const customerUrl = process.env.CUSTOMER_URL || "http://localhost:3000";
+const renterUrl = process.env.RENTER_URL || "http://localhost:3000";
 const serverUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || "4000"}`;
 const payfastSandbox = process.env.PAYFAST_SANDBOX !== "false";
 
 export const config = {
   frontend: {
     admin: adminUrl,
-    customer: customerUrl,
+    renter: renterUrl,
   },
   server: {
     url: serverUrl,
     port: parseInt(process.env.PORT || "4000", 10),
     corsOrigins: process.env.CORS_ORIGINS
       ? process.env.CORS_ORIGINS.split(",").map((o) => o.trim())
-      : [adminUrl, customerUrl],
+      : [adminUrl, renterUrl],
     rateLimit: {
       windowMs: parseInt(process.env.RATE_LIMIT_WINDOW || "900000", 10),
       max: parseInt(process.env.RATE_LIMIT_MAX || "100", 10),

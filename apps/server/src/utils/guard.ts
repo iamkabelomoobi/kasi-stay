@@ -16,9 +16,9 @@ export const Guards = {
     "Unauthorized: you must be logged in",
   ),
   admin: guard((ctx) => ctx.isAdmin, "Forbidden: admin access required"),
-  customer: guard(
-    (ctx) => ctx.isCustomer,
-    "Forbidden: customer access required",
+  renter: guard(
+    (ctx) => ctx.isRenter,
+    "Forbidden: renter access required",
   ),
   self: guard(
     (ctx, userId: string) => ctx.session?.user.id === userId,

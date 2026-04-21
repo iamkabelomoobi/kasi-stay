@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import type { PrismaClient, UserRole } from "@kasistay/db";
+import { PrismaClient, UserRole } from "@kasistay/db";
 
 type Runtime = {
   start: (port?: number) => Promise<number>;
@@ -23,7 +23,7 @@ export type FixtureUser = {
   role: UserRole;
   userId: string;
   adminId?: string;
-  customerId?: string;
+  renterId?: string;
 };
 
 export type CapturedEmail = {
@@ -49,7 +49,7 @@ const applyTestEnv = (): void => {
   process.env.APP_NAME ??= "kasistay Test";
   process.env.FRONTEND_URL ??= "http://localhost:3000";
   process.env.ADMIN_URL ??= "http://localhost:3001";
-  process.env.CUSTOMER_URL ??= "http://localhost:3000";
+  process.env.RENTER_URL ??= "http://localhost:3000";
   process.env.MAIL_PROVIDER ??= "mailhog";
   process.env.MAILHOG_HOST ??= "127.0.0.1";
   process.env.MAILHOG_PORT ??= "1025";
@@ -218,12 +218,12 @@ export const createIntegrationHarness = async () => {
     await createRoleRecord({ id: user.id, role: userRole[role] });
 
     const adminProfile =
-      role === "ADMIN"
+      role === UserRole.ADMIN
         ? await prisma.admin.findUnique({ where: { userId: user.id } })
         : null;
-    const customerProfile =
-      role === "CUSTOMER"
-        ? await prisma.customer.findUnique({ where: { userId: user.id } })
+    const renterProfile =
+      role === UserRole.RENTER
+        ? await prisma.renter.findUnique({ where: { userId: user.id } })
         : null;
 
     return {
@@ -233,7 +233,7 @@ export const createIntegrationHarness = async () => {
       role: userRole[role],
       userId: user.id,
       adminId: adminProfile?.id,
-      customerId: customerProfile?.id,
+      renterId: renterProfile?.id,
     };
   };
 

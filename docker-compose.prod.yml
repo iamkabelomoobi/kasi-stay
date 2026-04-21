@@ -34,7 +34,7 @@ services:
       NODE_ENV: production
       PORT: ${PORT:-4000}
       SERVER_URL: ${SERVER_URL:-http://localhost:4000}
-      CUSTOMER_URL: ${CUSTOMER_URL:-http://localhost:3000}
+      RENTER_URL: ${RENTER_URL:-http://localhost:3000}
       ADMIN_URL: ${ADMIN_URL:-http://localhost:3000}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
