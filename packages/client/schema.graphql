@@ -1,0 +1,100 @@
+type Admin {
+  id: ID
+  user: User
+  userId: String
+}
+
+input AdminUpdateInput {
+  email: String
+  image: String
+  name: String
+}
+
+scalar Date
+
+type Mutation {
+  """Delete an admin profile — admin only"""
+  deleteAdmin(id: ID!): Admin
+
+  """Delete a renter profile — admin only"""
+  deleteRenter(id: ID!): Renter
+
+  """Delete a user by ID — admin only"""
+  deleteUser(id: ID!): User
+
+  """Update an admin profile — admin only"""
+  updateAdmin(id: ID!, input: AdminUpdateInput!): Admin
+
+  """Update a renter profile — admin or self"""
+  updateRenter(id: ID!, input: RenterUpdateInput!): Renter
+
+  """Update a user — admin or self only"""
+  updateUser(id: ID!, input: UserUpdateInput!): User
+}
+
+type Query {
+  """Get an admin profile by ID — admin only"""
+  admin(id: ID!): Admin
+
+  """Get all admin profiles — admin only"""
+  admins: [Admin!]
+
+  """Get the currently authenticated user"""
+  me: User
+
+  """Get the current renter profile"""
+  myProfile: Renter
+
+  """Get a renter profile by ID — admin or self"""
+  renter(id: ID!): Renter
+
+  """Get all renter profiles — admin only"""
+  renters(search: RenterSearchInput): [Renter!]
+
+  """Get a user by ID — admin only"""
+  user(id: ID!): User
+
+  """Get all users — admin only"""
+  users(search: UserSearchInput): [User!]
+}
+
+type Renter {
+  createdAt: Date
+  id: ID
+  updatedAt: Date
+  user: User
+  userId: String
+}
+
+input RenterSearchInput {
+  email: String
+  name: String
+}
+
+input RenterUpdateInput {
+  email: String
+  image: String
+  name: String
+}
+
+type User {
+  admin: Admin
+  email: String
+  emailVerified: Boolean
+  id: ID
+  image: String
+  name: String
+  renter: Renter
+  role: String
+}
+
+input UserSearchInput {
+  email: String
+  name: String
+}
+
+input UserUpdateInput {
+  email: String
+  image: String
+  name: String
+}

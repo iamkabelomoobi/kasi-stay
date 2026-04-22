@@ -3,9 +3,16 @@ import { prisma, UserRole } from "@kasistay/db";
 import { pathToFileURL } from "node:url";
 
 export const seedAdmin = async () => {
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminName = process.env.ADMIN_NAME;
-  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminEmail = process.env.ADMIN_EMAIL?.trim();
+  const adminName = process.env.ADMIN_NAME?.trim();
+  const adminPassword = process.env.ADMIN_PASSWORD?.trim();
+
+  if (!adminEmail || !adminName || !adminPassword) {
+    console.info(
+      "[seeder] Skipping admin seed. Set ADMIN_EMAIL, ADMIN_NAME, and ADMIN_PASSWORD to enable it.",
+    );
+    return null;
+  }
 
   try {
     const existingUser = await prisma.user.findUnique({
@@ -32,9 +39,9 @@ export const seedAdmin = async () => {
 
     await auth.api.signUpEmail({
       body: {
-        email: adminEmail!,
-        password: adminPassword!,
-        name: adminName!,
+        email: adminEmail,
+        password: adminPassword,
+        name: adminName,
       },
     });
 
