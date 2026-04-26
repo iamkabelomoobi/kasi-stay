@@ -29,6 +29,7 @@ export const createServerRuntime = async (): Promise<ServerRuntime> => {
 
   const app = express();
   const httpServer = http.createServer(app);
+  app.set("trust proxy", true);
 
   let apolloServer: ApolloServer<Context>;
   try {

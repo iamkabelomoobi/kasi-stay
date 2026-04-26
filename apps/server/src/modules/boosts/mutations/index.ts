@@ -1,5 +1,7 @@
 import { ListingBoostType, Prisma, PropertyStatus } from "@kasistay/db";
 import { Context } from "../../../app/context";
+import { syncPropertySearchDocument } from "../../search/queries";
+import { propertyInclude } from "../../properties/queries";
 import { badInput, notFound, unauthorized } from "../../../utils/errors";
 import { listingBoostInclude } from "../queries";
 
@@ -109,7 +111,7 @@ export const createPropertyBoost = async (
     badInput("Boost type is required");
   }
 
-  return ctx.prisma.$transaction(async (tx) => {
+  const boost = await ctx.prisma.$transaction(async (tx) => {
     const property = await assertCanManagePropertyBoost(propertyId, ctx, tx);
 
     if (
@@ -142,10 +144,21 @@ export const createPropertyBoost = async (
 
     return boost;
   });
+
+  const property = await ctx.prisma.property.findUnique({
+    where: { id: propertyId },
+    include: propertyInclude,
+  });
+
+  if (property) {
+    await syncPropertySearchDocument(property);
+  }
+
+  return boost;
 };
 
 export const deletePropertyBoost = async (boostId: string, ctx: Context) => {
-  return ctx.prisma.$transaction(async (tx) => {
+  const deleted = await ctx.prisma.$transaction(async (tx) => {
     const boost = await tx.listingBoost.findUnique({
       where: { id: boostId },
       include: {
@@ -199,6 +212,17 @@ export const deletePropertyBoost = async (boostId: string, ctx: Context) => {
       });
     }
 
-    return true;
+    return boost!.propertyId;
   });
+
+  const property = await ctx.prisma.property.findUnique({
+    where: { id: deleted },
+    include: propertyInclude,
+  });
+
+  if (property) {
+    await syncPropertySearchDocument(property);
+  }
+
+  return true;
 };
