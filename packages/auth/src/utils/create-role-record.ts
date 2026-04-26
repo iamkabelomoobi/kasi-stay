@@ -1,4 +1,4 @@
-import { prisma, UserRole, VerificationStatus } from "@kasistay/db";
+import { prisma, UserRole } from "@kasistay/db";
 
 export type AuthHookUser = {
   id: string;
@@ -21,7 +21,6 @@ export const createRoleRecord = async (user: AuthHookUser): Promise<void> => {
     });
 
     await tx.admin.deleteMany({ where: { userId: user.id } });
-    await tx.landlord.deleteMany({ where: { userId: user.id } });
     await tx.renter.deleteMany({ where: { userId: user.id } });
 
     switch (role) {
@@ -31,20 +30,16 @@ export const createRoleRecord = async (user: AuthHookUser): Promise<void> => {
         });
         break;
 
-      case UserRole.LANDLORD:
-        await tx.landlord.create({
-          data: {
-            userId: user.id,
-            verificationStatus: VerificationStatus.PENDING,
-          },
-        });
-        break;
-
       case UserRole.RENTER:
-      default:
         await tx.renter.create({
           data: { userId: user.id },
         });
+        break;
+
+      case UserRole.AGENT:
+      case UserRole.OWNER:
+      case UserRole.BUYER:
+      default:
         break;
     }
   });

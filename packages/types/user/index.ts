@@ -1,16 +1,26 @@
-type User = {
+export enum UserRole {
+  ADMIN = "ADMIN",
+  AGENT = "AGENT",
+  OWNER = "OWNER",
+  BUYER = "BUYER",
+  RENTER = "RENTER",
+}
+
+export type User = {
   id: string;
   name: string;
   email: string;
-  emailVerified: string;
-  image: string;
+  emailVerified: boolean;
+  image?: string | null;
+  phone?: string | null;
+  avatar?: string | null;
+  isVerified: boolean;
   role: UserRole;
-
   createdAt: Date;
   updatedAt: Date;
 };
 
-type AdminLandlordRenter = {
+export type Admin = {
   id: string;
   userId: string;
   user: User;
@@ -18,14 +28,10 @@ type AdminLandlordRenter = {
   updatedAt: Date;
 };
 
-type Admin = AdminLandlordRenter & {};
-
-type Landlord = AdminLandlordRenter & {};
-
-type Renter = AdminLandlordRenter & {};
-
-enum UserRole {
-  ADMIN,
-  LANDLORD,
-  RENTER,
-}
+export type Renter = {
+  id: string;
+  userId: string;
+  user: User;
+  createdAt: Date;
+  updatedAt: Date;
+};

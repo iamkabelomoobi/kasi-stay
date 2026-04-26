@@ -3,6 +3,9 @@ import { Context } from "./context";
 export const shields = {
   isAuthenticated: (ctx: Context): boolean => ctx.isAuthenticated,
   isAdmin: (ctx: Context): boolean => ctx.isAdmin,
+  isAgent: (ctx: Context): boolean => ctx.isAgent,
+  isOwner: (ctx: Context): boolean => ctx.isOwner,
+  isBuyer: (ctx: Context): boolean => ctx.isBuyer,
   isRenter: (ctx: Context): boolean => ctx.isRenter,
 
   isSelf: (ctx: Context, userId: string): boolean => {

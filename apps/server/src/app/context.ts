@@ -48,6 +48,18 @@ export class Context {
     return this.role === UserRole.ADMIN;
   }
 
+  get isAgent(): boolean {
+    return this.role === UserRole.AGENT;
+  }
+
+  get isOwner(): boolean {
+    return this.role === UserRole.OWNER;
+  }
+
+  get isBuyer(): boolean {
+    return this.role === UserRole.BUYER;
+  }
+
   get isRenter(): boolean {
     return this.role === UserRole.RENTER;
   }
@@ -71,6 +83,30 @@ export class Context {
     const user = this.assertAuth();
     if (!this.isRenter) {
       throw new Error("Forbidden: renter access required");
+    }
+    return user;
+  }
+
+  assertAgent(): SessionUser {
+    const user = this.assertAuth();
+    if (!this.isAgent) {
+      throw new Error("Forbidden: agent access required");
+    }
+    return user;
+  }
+
+  assertOwner(): SessionUser {
+    const user = this.assertAuth();
+    if (!this.isOwner) {
+      throw new Error("Forbidden: owner access required");
+    }
+    return user;
+  }
+
+  assertBuyer(): SessionUser {
+    const user = this.assertAuth();
+    if (!this.isBuyer) {
+      throw new Error("Forbidden: buyer access required");
     }
     return user;
   }
