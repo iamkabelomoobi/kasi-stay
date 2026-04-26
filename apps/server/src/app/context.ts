@@ -114,6 +114,10 @@ export class Context {
     return user;
   }
 
+  static internal(): Context {
+    return new Context(prisma, null, new Headers(), null);
+  }
+
   static async fromRequest(req: Request): Promise<Context> {
     const forwardedForHeader = req.headers["x-forwarded-for"];
     const forwardedFor =

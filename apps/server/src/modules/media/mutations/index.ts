@@ -1,5 +1,10 @@
 import { Prisma, PropertyMediaType } from "@kasistay/db";
 import { Context } from "../../../app/context";
+import {
+  config,
+  createPropertyUploadTarget,
+  deleteStorageObject,
+} from "../../../infra";
 import { badInput, notFound, unauthorized } from "../../../utils/errors";
 import { propertyInclude } from "../../properties/queries";
 
@@ -50,6 +55,50 @@ const assertCanManageProperty = async (
   }
 
   return property!;
+};
+
+const MAX_MEDIA_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+const allowedUploadContentTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "video/mp4",
+  "application/pdf",
+]);
+
+export const createPropertyMediaUploadTarget = async (
+  propertyId: string,
+  input: {
+    filename: string;
+    contentType: string;
+    sizeBytes: number;
+  },
+  ctx: Context,
+) => {
+  await assertCanManageProperty(propertyId, ctx);
+
+  if (!config.storage.enabled) {
+    badInput("Storage uploads are not configured");
+  }
+
+  if (!allowedUploadContentTypes.has(input.contentType)) {
+    badInput(`Unsupported media content type: ${input.contentType}`);
+  }
+
+  if (input.sizeBytes <= 0 || input.sizeBytes > MAX_MEDIA_FILE_SIZE_BYTES) {
+    badInput("Media uploads must be between 1 byte and 10MB");
+  }
+
+  const uploadTarget = await createPropertyUploadTarget({
+    propertyId,
+    filename: input.filename,
+    contentType: input.contentType,
+  });
+
+  return {
+    ...uploadTarget,
+    contentType: input.contentType,
+  };
 };
 
 export const addPropertyMedia = async (
@@ -208,7 +257,7 @@ export const deletePropertyMedia = async (
   mediaId: string,
   ctx: Context,
 ) => {
-  return ctx.prisma.$transaction(async (tx) => {
+  const { property, deletedMediaUrl } = await ctx.prisma.$transaction(async (tx) => {
     await assertCanManageProperty(propertyId, ctx, tx);
 
     const media = await tx.propertyMedia.findFirst({
@@ -221,6 +270,8 @@ export const deletePropertyMedia = async (
     if (!media) {
       notFound("Property media not found");
     }
+
+    const deletedMediaUrl = media!.url;
 
     await tx.propertyMedia.delete({
       where: { id: mediaId },
@@ -240,9 +291,14 @@ export const deletePropertyMedia = async (
       }
     }
 
-    return tx.property.findUnique({
+    const property = await tx.property.findUnique({
       where: { id: propertyId },
       include: propertyInclude,
     });
+
+    return { property, deletedMediaUrl };
   });
+
+  await deleteStorageObject({ url: deletedMediaUrl });
+  return property;
 };
