@@ -177,7 +177,8 @@ InstallmentRef.implement({
   }),
 });
 
-const PaymentPlanRef = builder.objectRef<PaymentPlanShape>("PaymentPlan");
+export const PaymentPlanRef =
+  builder.objectRef<PaymentPlanShape>("PaymentPlan");
 PaymentPlanRef.implement({
   fields: (t) => ({
     id: t.id({ resolve: (parent) => parent.id }),
@@ -190,7 +191,7 @@ PaymentPlanRef.implement({
   }),
 });
 
-const BuyDetailRef = builder.objectRef<BuyDetailShape>("BuyDetail");
+export const BuyDetailRef = builder.objectRef<BuyDetailShape>("BuyDetail");
 BuyDetailRef.implement({
   fields: (t) => ({
     id: t.id({ resolve: (parent) => parent.id }),
