@@ -7,6 +7,7 @@ export * from "./media";
 export * from "./inquiries";
 export * from "./notifications";
 export * from "./properties";
+export * from "./rent";
 export * from "./renter";
 export * from "./reports";
 export * from "./reviews";
