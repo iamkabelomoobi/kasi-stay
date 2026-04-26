@@ -17,10 +17,7 @@ import {
 import type { Prisma } from "@kasistay/db";
 import { Context } from "../../../app/context";
 import { cache, cacheKeys, config } from "../../../infra";
-import {
-  removePropertyFromSearchIndex,
-  syncPropertySearchDocument,
-} from "../../search/queries";
+import { enqueuePropertySearchSync } from "../../search/jobs";
 import { slugify } from "../../../utils/slugify";
 import { badInput, notFound, unauthorized } from "../../../utils/errors";
 import { getPropertyDefaultPriceFrequency, propertyInclude } from "../queries";
@@ -397,7 +394,7 @@ export const createProperty = async (
   });
 
   if (property) {
-    await syncPropertySearchDocument(property);
+    await enqueuePropertySearchSync({ propertyId: property.id });
   }
 
   return property;
@@ -560,7 +557,7 @@ export const updateProperty = async (
   });
 
   if (property) {
-    await syncPropertySearchDocument(property);
+    await enqueuePropertySearchSync({ propertyId: property.id });
   }
 
   return property;
@@ -576,7 +573,7 @@ export const deleteProperty = async (
     include: propertyInclude,
   });
 
-  await removePropertyFromSearchIndex(propertyId);
+  await enqueuePropertySearchSync({ propertyId, action: "delete" });
   return property;
 };
 
@@ -612,7 +609,7 @@ export const publishProperty = async (
     },
   });
 
-  await syncPropertySearchDocument(property);
+  await enqueuePropertySearchSync({ propertyId: property.id });
   return property;
 };
 
@@ -629,7 +626,7 @@ export const archiveProperty = async (
     },
   });
 
-  await syncPropertySearchDocument(property);
+  await enqueuePropertySearchSync({ propertyId: property.id });
   return property;
 };
 
@@ -796,7 +793,7 @@ export const duplicateProperty = async (
   });
 
   if (property) {
-    await syncPropertySearchDocument(property);
+    await enqueuePropertySearchSync({ propertyId: property.id });
   }
 
   return property;

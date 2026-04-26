@@ -22,3 +22,11 @@ export type QueueJob<TPayload> = {
 };
 
 export type QueueProcessor<TPayload> = (payload: TPayload) => Promise<void>;
+
+export type RecurringQueueJob<TPayload> = {
+  name: QueueJobName;
+  payload: TPayload;
+  intervalMs: number;
+  options?: QueueJobOptions;
+  runOnStart?: boolean;
+};

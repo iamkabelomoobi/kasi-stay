@@ -1,16 +1,18 @@
 import "dotenv/config";
 import { connectDatabase, disconnectDatabase } from "@kasistay/db";
 import { logger } from "@kasistay/logger";
+import { ensurePropertySearchIndex } from "../search";
 import { startQueueWorker } from "../queue/client";
-import { registerAuthProcessors } from "./processors";
+import { registerWorkerProcessors } from "./processors";
 
-let stopWorker: (() => void) | null = null;
+let stopWorker: (() => Promise<void>) | null = null;
 
 export const bootstrapWorkers = async (): Promise<void> => {
   await connectDatabase();
 
-  registerAuthProcessors();
-  stopWorker = startQueueWorker();
+  await ensurePropertySearchIndex();
+  registerWorkerProcessors();
+  stopWorker = await startQueueWorker();
 
   logger.info("Worker runtime started");
 };
@@ -19,7 +21,7 @@ const shutdownWorkers = async (signal: NodeJS.Signals): Promise<void> => {
   logger.info(`Received ${signal}. Shutting down workers.`);
 
   if (stopWorker) {
-    stopWorker();
+    await stopWorker();
   }
 
   await disconnectDatabase();

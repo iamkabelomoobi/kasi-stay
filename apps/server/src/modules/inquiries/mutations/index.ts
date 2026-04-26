@@ -1,5 +1,6 @@
 import { InquirySource, InquiryStatus, Prisma } from "@kasistay/db";
 import { Context } from "../../../app/context";
+import { enqueueNotificationEmail } from "../../notifications/jobs";
 import { badInput, notFound, unauthorized } from "../../../utils/errors";
 import { inquiryInclude } from "../queries";
 
@@ -82,9 +83,21 @@ export const createInquiry = async (
   const property = await ctx.prisma.property.findUnique({
     where: { id: propertyId },
     include: {
-      agency: {
+      agent: {
         select: {
-          ownerId: true,
+          email: true,
+          name: true,
+        },
+      },
+      agency: {
+        include: {
+          owner: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+            },
+          },
         },
       },
     },
@@ -115,7 +128,7 @@ export const createInquiry = async (
 
   const notificationRecipients = [
     property!.agentId,
-    property!.agency?.ownerId,
+    property!.agency?.owner?.id,
   ].filter((value, index, values): value is string => {
     return Boolean(value) && values.indexOf(value) === index;
   });
@@ -134,6 +147,40 @@ export const createInquiry = async (
       })),
     });
   }
+
+  const emailRecipients = [
+    property!.agent?.email
+      ? {
+          email: property!.agent.email,
+          name: property!.agent.name ?? "Agent",
+        }
+      : null,
+    property!.agency?.owner?.email
+      ? {
+          email: property!.agency.owner.email,
+          name: property!.agency.owner.name ?? property!.agency.name,
+        }
+      : null,
+  ].filter(
+    (
+      recipient,
+      index,
+      recipients,
+    ): recipient is { email: string; name: string } =>
+      Boolean(recipient) &&
+      recipients.findIndex((item) => item?.email === recipient?.email) === index,
+  );
+
+  await Promise.all(
+    emailRecipients.map((recipient) =>
+      enqueueNotificationEmail({
+        to: recipient.email,
+        subject: `New property inquiry: ${property!.title}`,
+        text: `${input.name} submitted a new inquiry for ${property!.title}.`,
+        html: `<p><strong>${input.name}</strong> submitted a new inquiry for <strong>${property!.title}</strong>.</p><p>Email: ${input.email}</p>${input.phone ? `<p>Phone: ${input.phone}</p>` : ""}${input.message ? `<p>Message: ${input.message}</p>` : ""}`,
+      }),
+    ),
+  );
 
   return inquiry;
 };

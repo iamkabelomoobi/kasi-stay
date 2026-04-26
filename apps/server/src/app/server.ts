@@ -7,7 +7,7 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "@kasistay/auth";
 import { connectDatabase, disconnectDatabase } from "@kasistay/db";
 import { logger } from "@kasistay/logger";
-import { config } from "../infra";
+import { config, ensurePropertySearchIndex } from "../infra";
 import { Context } from "./context";
 import { schema } from "./index";
 import ip from "ip";
@@ -22,6 +22,7 @@ type ServerRuntime = {
 export const createServerRuntime = async (): Promise<ServerRuntime> => {
   try {
     await connectDatabase();
+    await ensurePropertySearchIndex();
   } catch (error) {
     logger.error("Failed to connect to database", { error });
     throw error;

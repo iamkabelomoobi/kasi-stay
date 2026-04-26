@@ -1,7 +1,6 @@
 import { ListingBoostType, Prisma, PropertyStatus } from "@kasistay/db";
 import { Context } from "../../../app/context";
-import { syncPropertySearchDocument } from "../../search/queries";
-import { propertyInclude } from "../../properties/queries";
+import { enqueuePropertySearchSync } from "../../search/jobs";
 import { badInput, notFound, unauthorized } from "../../../utils/errors";
 import { listingBoostInclude } from "../queries";
 
@@ -145,14 +144,7 @@ export const createPropertyBoost = async (
     return boost;
   });
 
-  const property = await ctx.prisma.property.findUnique({
-    where: { id: propertyId },
-    include: propertyInclude,
-  });
-
-  if (property) {
-    await syncPropertySearchDocument(property);
-  }
+  await enqueuePropertySearchSync({ propertyId });
 
   return boost;
 };
@@ -215,14 +207,7 @@ export const deletePropertyBoost = async (boostId: string, ctx: Context) => {
     return boost!.propertyId;
   });
 
-  const property = await ctx.prisma.property.findUnique({
-    where: { id: deleted },
-    include: propertyInclude,
-  });
-
-  if (property) {
-    await syncPropertySearchDocument(property);
-  }
+  await enqueuePropertySearchSync({ propertyId: deleted });
 
   return true;
 };

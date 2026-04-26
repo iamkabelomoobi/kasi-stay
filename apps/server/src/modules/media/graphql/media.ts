@@ -2,6 +2,7 @@ import { builder } from "../../../app/builder";
 import { PropertyMediaRef, PropertyRef } from "../../properties/graphql/property";
 import {
   addPropertyMedia,
+  createPropertyMediaUploadTarget,
   deletePropertyMedia,
   reorderPropertyMedia,
   setPrimaryPropertyMedia,
@@ -9,8 +10,22 @@ import {
 import { getPropertyMedia } from "../queries";
 import {
   AddPropertyMediaInput,
+  CreatePropertyMediaUploadTargetInput,
   PropertyMediaReorderInput,
 } from "../media.types";
+
+const PropertyMediaUploadTargetRef = builder.simpleObject(
+  "PropertyMediaUploadTarget",
+  {
+    fields: (t) => ({
+      key: t.string(),
+      uploadUrl: t.string(),
+      publicUrl: t.string(),
+      expiresInSeconds: t.int(),
+      contentType: t.string(),
+    }),
+  },
+);
 
 builder.queryField("propertyMedia", (t) =>
   t.field({
@@ -35,6 +50,21 @@ builder.mutationField("addPropertyMedia", (t) =>
     },
     resolve: (_, args, ctx) =>
       addPropertyMedia(String(args.propertyId), args.input, ctx),
+  }),
+);
+
+builder.mutationField("createPropertyMediaUploadTarget", (t) =>
+  t.field({
+    type: PropertyMediaUploadTargetRef,
+    authScopes: { isAuthenticated: true },
+    description:
+      "Create a pre-signed upload target for property media stored in S3-compatible storage",
+    args: {
+      propertyId: t.arg.id({ required: true }),
+      input: t.arg({ type: CreatePropertyMediaUploadTargetInput, required: true }),
+    },
+    resolve: (_, args, ctx) =>
+      createPropertyMediaUploadTarget(String(args.propertyId), args.input, ctx),
   }),
 );
 

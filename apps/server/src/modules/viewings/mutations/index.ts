@@ -1,5 +1,6 @@
 import { InquiryStatus, Prisma, ViewingStatus } from "@kasistay/db";
 import { Context } from "../../../app/context";
+import { enqueueNotificationEmail } from "../../notifications/jobs";
 import { badInput, notFound, unauthorized } from "../../../utils/errors";
 import { viewingInclude } from "../queries";
 
@@ -95,19 +96,40 @@ export const scheduleViewing = async (
 ) => {
   const user = ctx.assertAuth();
 
-  return ctx.prisma.$transaction(async (tx) => {
+  const viewing = await ctx.prisma.$transaction(async (tx) => {
     const inquiry = await tx.inquiry.findUnique({
       where: { id: inquiryId },
-      include: {
+      select: {
+        propertyId: true,
+        userId: true,
         property: {
           select: {
             title: true,
             agentId: true,
-            agency: {
+            agent: {
               select: {
-                ownerId: true,
+                email: true,
+                name: true,
               },
             },
+            agency: {
+              select: {
+                owner: {
+                  select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                  },
+                },
+                name: true,
+              },
+            },
+          },
+        },
+        user: {
+          select: {
+            email: true,
+            name: true,
           },
         },
       },
@@ -121,7 +143,7 @@ export const scheduleViewing = async (
       ctx.isAdmin ||
       inquiry!.userId === user.id ||
       inquiry!.property.agentId === user.id ||
-      inquiry!.property.agency?.ownerId === user.id;
+      inquiry!.property.agency?.owner?.id === user.id;
 
     if (!canSchedule) {
       unauthorized();
@@ -152,7 +174,7 @@ export const scheduleViewing = async (
 
     const notificationRecipients = [
       inquiry!.property.agentId,
-      inquiry!.property.agency?.ownerId,
+      inquiry!.property.agency?.owner?.id,
       inquiry!.userId,
     ].filter((value, index, values): value is string => {
       return Boolean(value) && values.indexOf(value) === index;
@@ -176,6 +198,48 @@ export const scheduleViewing = async (
 
     return viewing;
   });
+
+  const emailRecipients = [
+    viewing.user?.email
+      ? {
+          email: viewing.user.email,
+          name: viewing.user.name ?? "Viewer",
+        }
+      : null,
+    viewing.property.agent?.email
+      ? {
+          email: viewing.property.agent.email,
+          name: viewing.property.agent.name ?? "Agent",
+        }
+      : null,
+    viewing.property.agency?.owner?.email
+      ? {
+          email: viewing.property.agency.owner.email,
+          name: viewing.property.agency.owner.name ?? viewing.property.agency.name,
+        }
+      : null,
+  ].filter(
+    (
+      recipient,
+      index,
+      recipients,
+    ): recipient is { email: string; name: string } =>
+      Boolean(recipient) &&
+      recipients.findIndex((item) => item?.email === recipient?.email) === index,
+  );
+
+  await Promise.all(
+    emailRecipients.map((recipient) =>
+      enqueueNotificationEmail({
+        to: recipient.email,
+        subject: `Viewing scheduled: ${viewing.property.title}`,
+        text: `A viewing for ${viewing.property.title} is scheduled on ${viewing.scheduledAt.toISOString()}.`,
+        html: `<p>A viewing for <strong>${viewing.property.title}</strong> is scheduled on <strong>${viewing.scheduledAt.toISOString()}</strong>.</p>`,
+      }),
+    ),
+  );
+
+  return viewing;
 };
 
 export const confirmViewing = async (viewingId: string, ctx: Context) => {

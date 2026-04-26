@@ -62,6 +62,7 @@ export const config = {
     },
     worker: {
       pollIntervalMs: parseInt(process.env.QUEUE_POLL_INTERVAL_MS || "500", 10),
+      concurrency: parseInt(process.env.QUEUE_WORKER_CONCURRENCY || "5", 10),
     },
     jobs: {
       propertyExpiryIntervalMs: parseInt(

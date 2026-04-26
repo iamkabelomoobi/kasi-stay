@@ -21,6 +21,17 @@ export const AddPropertyMediaInput = builder.inputType("AddPropertyMediaInput", 
   }),
 });
 
+export const CreatePropertyMediaUploadTargetInput = builder.inputType(
+  "CreatePropertyMediaUploadTargetInput",
+  {
+    fields: (t) => ({
+      filename: t.string({ required: true }),
+      contentType: t.string({ required: true }),
+      sizeBytes: t.int({ required: true }),
+    }),
+  },
+);
+
 export const PropertyMediaReorderItemInput = builder.inputType(
   "PropertyMediaReorderItemInput",
   {
