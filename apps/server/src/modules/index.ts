@@ -12,6 +12,7 @@ export * from "./reports";
 export * from "./reviews";
 export * from "./saved";
 export * from "./search";
+export * from "./sell";
 export * from "./subscriptions";
 export * from "./user";
 export * from "./viewings";

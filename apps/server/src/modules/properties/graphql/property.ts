@@ -266,7 +266,8 @@ RentDetailRef.implement({
   }),
 });
 
-const PriceHistoryRef = builder.objectRef<PriceHistoryShape>("PriceHistory");
+export const PriceHistoryRef =
+  builder.objectRef<PriceHistoryShape>("PriceHistory");
 PriceHistoryRef.implement({
   fields: (t) => ({
     id: t.id({ resolve: (parent) => parent.id }),
@@ -276,7 +277,7 @@ PriceHistoryRef.implement({
   }),
 });
 
-const SellDetailRef = builder.objectRef<SellDetailShape>("SellDetail");
+export const SellDetailRef = builder.objectRef<SellDetailShape>("SellDetail");
 SellDetailRef.implement({
   fields: (t) => ({
     id: t.id({ resolve: (parent) => parent.id }),
