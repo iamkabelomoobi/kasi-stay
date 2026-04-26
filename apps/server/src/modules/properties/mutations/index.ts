@@ -16,6 +16,11 @@ import {
 } from "@kasistay/db";
 import type { Prisma } from "@kasistay/db";
 import { Context } from "../../../app/context";
+import { cache, cacheKeys, config } from "../../../infra";
+import {
+  removePropertyFromSearchIndex,
+  syncPropertySearchDocument,
+} from "../../search/queries";
 import { slugify } from "../../../utils/slugify";
 import { badInput, notFound, unauthorized } from "../../../utils/errors";
 import { getPropertyDefaultPriceFrequency, propertyInclude } from "../queries";
@@ -268,7 +273,7 @@ export const createProperty = async (
   const resolvedAgentId =
     (ctx.isAgent && !input.agentId ? sessionUser.id : input.agentId) ?? null;
 
-  return ctx.prisma.$transaction(async (tx) => {
+  const property = await ctx.prisma.$transaction(async (tx) => {
     if (resolvedAgentId) {
       await ensureAgentListingCapacity(resolvedAgentId, ctx, tx);
     }
@@ -390,6 +395,12 @@ export const createProperty = async (
       include: propertyInclude,
     });
   });
+
+  if (property) {
+    await syncPropertySearchDocument(property);
+  }
+
+  return property;
 };
 
 export const updateProperty = async (
@@ -423,7 +434,7 @@ export const updateProperty = async (
   },
   ctx: Context,
 ) => {
-  return ctx.prisma.$transaction(async (tx) => {
+  const property = await ctx.prisma.$transaction(async (tx) => {
     const current = await assertCanManageProperty(propertyId, ctx, tx);
     const existingProperty = current!;
     const nextSlug =
@@ -547,6 +558,12 @@ export const updateProperty = async (
       include: propertyInclude,
     });
   });
+
+  if (property) {
+    await syncPropertySearchDocument(property);
+  }
+
+  return property;
 };
 
 export const deleteProperty = async (
@@ -554,18 +571,20 @@ export const deleteProperty = async (
   ctx: Context,
 ) => {
   await assertCanManageProperty(propertyId, ctx);
-  return ctx.prisma.property.delete({
+  const property = await ctx.prisma.property.delete({
     where: { id: propertyId },
     include: propertyInclude,
   });
+
+  await removePropertyFromSearchIndex(propertyId);
+  return property;
 };
 
 export const publishProperty = async (
   propertyId: string,
   ctx: Context,
 ) => {
-  const property = await assertCanManageProperty(propertyId, ctx);
-  const managedProperty = property!;
+  const managedProperty = await assertCanManageProperty(propertyId, ctx);
   const [location, imageCount] = await Promise.all([
     ctx.prisma.location.findUnique({ where: { propertyId } }),
     ctx.prisma.propertyMedia.count({
@@ -585,13 +604,16 @@ export const publishProperty = async (
     badInput("At least one image is required before publishing");
   }
 
-  return ctx.prisma.property.update({
+  const property = await ctx.prisma.property.update({
     where: { id: propertyId },
     include: propertyInclude,
     data: {
       status: PropertyStatus.PUBLISHED,
     },
   });
+
+  await syncPropertySearchDocument(property);
+  return property;
 };
 
 export const archiveProperty = async (
@@ -599,20 +621,23 @@ export const archiveProperty = async (
   ctx: Context,
 ) => {
   await assertCanManageProperty(propertyId, ctx);
-  return ctx.prisma.property.update({
+  const property = await ctx.prisma.property.update({
     where: { id: propertyId },
     include: propertyInclude,
     data: {
       status: PropertyStatus.ARCHIVED,
     },
   });
+
+  await syncPropertySearchDocument(property);
+  return property;
 };
 
 export const duplicateProperty = async (
   propertyId: string,
   ctx: Context,
 ) => {
-  return ctx.prisma.$transaction(async (tx) => {
+  const property = await ctx.prisma.$transaction(async (tx) => {
     const property = await assertCanManageProperty(propertyId, ctx, tx);
     const full = await tx.property.findUnique({
       where: { id: property.id },
@@ -769,6 +794,12 @@ export const duplicateProperty = async (
       include: propertyInclude,
     });
   });
+
+  if (property) {
+    await syncPropertySearchDocument(property);
+  }
+
+  return property;
 };
 
 export const trackPropertyView = async (
@@ -777,11 +808,34 @@ export const trackPropertyView = async (
 ) => {
   const existing = await ctx.prisma.property.findUnique({
     where: { id: propertyId },
-    select: { id: true },
+    include: propertyInclude,
   });
 
   if (!existing) {
     notFound("Property not found");
+  }
+
+  const ipAddress = ctx.ipAddress?.trim();
+  if (!ipAddress) {
+    return ctx.prisma.property.update({
+      where: { id: propertyId },
+      include: propertyInclude,
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    });
+  }
+
+  const shouldCountView = await cache.setIfNotExists(
+    cacheKeys.propertyView(propertyId, ipAddress),
+    "1",
+    config.redis.propertyViewDebounceTtlSeconds,
+  );
+
+  if (!shouldCountView) {
+    return existing;
   }
 
   return ctx.prisma.property.update({

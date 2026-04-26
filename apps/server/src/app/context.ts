@@ -25,15 +25,18 @@ export class Context {
   public readonly prisma: typeof prisma;
   public readonly session: Session | null;
   public readonly headers: Headers;
+  public readonly ipAddress: string | null;
 
   private constructor(
     _prisma: typeof prisma,
     _session: Session | null,
     _headers: Headers,
+    _ipAddress: string | null,
   ) {
     this.prisma = _prisma;
     this.session = _session;
     this.headers = _headers;
+    this.ipAddress = _ipAddress;
   }
 
   get role(): UserRole {
@@ -112,13 +115,22 @@ export class Context {
   }
 
   static async fromRequest(req: Request): Promise<Context> {
+    const forwardedForHeader = req.headers["x-forwarded-for"];
+    const forwardedFor =
+      typeof forwardedForHeader === "string"
+        ? forwardedForHeader.split(",")[0]?.trim() ?? null
+        : Array.isArray(forwardedForHeader)
+          ? forwardedForHeader[0]?.trim() ?? null
+          : null;
+    const ipAddress = forwardedFor ?? req.ip ?? null;
+
     try {
       const headers = getBetterAuthHeaders(req.headers);
       const session = await auth.api.getSession({ headers });
-      return new Context(prisma, session as Session | null, headers);
+      return new Context(prisma, session as Session | null, headers, ipAddress);
     } catch (error) {
       logger.warn("Failed to get session from request", { error });
-      return new Context(prisma, null, new Headers());
+      return new Context(prisma, null, new Headers(), ipAddress);
     }
   }
 }
