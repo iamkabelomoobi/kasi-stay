@@ -15,6 +15,9 @@ export const builder = new SchemaBuilder<{
   AuthScopes: {
     isAuthenticated: boolean;
     isAdmin: boolean;
+    isAgent: boolean;
+    isOwner: boolean;
+    isBuyer: boolean;
     isRenter: boolean;
   };
   PrismaTypes: PrismaTypes;
@@ -36,6 +39,9 @@ export const builder = new SchemaBuilder<{
     authScopes: (ctx) => ({
       isAuthenticated: ctx.isAuthenticated,
       isAdmin: ctx.isAdmin,
+      isAgent: ctx.isAgent,
+      isOwner: ctx.isOwner,
+      isBuyer: ctx.isBuyer,
       isRenter: ctx.isRenter,
     }),
   },

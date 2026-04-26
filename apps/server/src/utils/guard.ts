@@ -16,6 +16,9 @@ export const Guards = {
     "Unauthorized: you must be logged in",
   ),
   admin: guard((ctx) => ctx.isAdmin, "Forbidden: admin access required"),
+  agent: guard((ctx) => ctx.isAgent, "Forbidden: agent access required"),
+  owner: guard((ctx) => ctx.isOwner, "Forbidden: owner access required"),
+  buyer: guard((ctx) => ctx.isBuyer, "Forbidden: buyer access required"),
   renter: guard(
     (ctx) => ctx.isRenter,
     "Forbidden: renter access required",
