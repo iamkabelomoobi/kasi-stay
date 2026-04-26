@@ -42,6 +42,50 @@ const requireManagerRole = (ctx: Context): void => {
   }
 };
 
+const ensureAgentListingCapacity = async (
+  agentId: string,
+  ctx: Context,
+  transaction: Prisma.TransactionClient,
+) => {
+  if (ctx.isAdmin) {
+    return;
+  }
+
+  const now = new Date();
+  const activeSubscription = await transaction.agentSubscription.findFirst({
+    where: {
+      agentId,
+      isActive: true,
+      expiresAt: {
+        gt: now,
+      },
+    },
+    include: {
+      plan: true,
+    },
+    orderBy: {
+      expiresAt: "desc",
+    },
+  });
+
+  if (!activeSubscription) {
+    badInput("An active subscription is required before creating listings");
+  }
+
+  const activeListingCount = await transaction.property.count({
+    where: {
+      agentId,
+      status: {
+        in: [PropertyStatus.DRAFT, PropertyStatus.PUBLISHED],
+      },
+    },
+  });
+
+  if (activeListingCount >= activeSubscription!.plan.listingLimit) {
+    badInput("Listing limit reached for the active subscription");
+  }
+};
+
 const generateUniqueSlug = async (
   title: string,
   ctx: Context,
@@ -221,8 +265,14 @@ export const createProperty = async (
 
   const resolvedListingType = listingType!;
   const resolvedPropertyType = propertyType!;
+  const resolvedAgentId =
+    (ctx.isAgent && !input.agentId ? sessionUser.id : input.agentId) ?? null;
 
   return ctx.prisma.$transaction(async (tx) => {
+    if (resolvedAgentId) {
+      await ensureAgentListingCapacity(resolvedAgentId, ctx, tx);
+    }
+
     const slug = await generateUniqueSlug(input.title, ctx, tx);
     const media = mapMediaInputs(input.media);
     const documents = mapDocumentInputs(input.documents);
@@ -264,14 +314,11 @@ export const createProperty = async (
         availableFrom: input.availableFrom ?? null,
         permitNumber: input.permitNumber ?? null,
         expiresAt: input.expiresAt ?? null,
-        ...((ctx.isAgent && !input.agentId) || input.agentId
+        ...(resolvedAgentId
           ? {
               agent: {
                 connect: {
-                  id:
-                    (ctx.isAgent && !input.agentId
-                      ? sessionUser.id
-                      : input.agentId)!,
+                  id: resolvedAgentId,
                 },
               },
             }

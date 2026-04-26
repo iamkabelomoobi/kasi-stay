@@ -34,6 +34,9 @@ const Navbar = () => {
 
         <div className="hidden shrink-0 sm:block">
           <button className="rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:opacity-90 md:px-6 md:py-3">
+            Sign In / Sign Up
+          </button>
+          <button className="ml-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:opacity-90 md:px-6 md:py-3">
             Book Now
           </button>
         </div>
