@@ -8,33 +8,57 @@ import { createRoleRecord } from "../utils/create-role-record";
 const appName = process.env.APP_NAME || "kasistay";
 
 type AuthUser = {
-  id: string;
+  id?: string;
   name: string;
   email: string;
-  role: UserRole;
-};
-
-const sendWelcomeEmail = async (user: AuthUser): Promise<void> => {
-  await sendEmail(
-    authenticationTemplates.welcomeTemplate({
-      email: user.email,
-      name: user.name,
-      appName,
-    }),
-  );
+  role?: UserRole;
 };
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  emailVerification: {
+    sendOnSignUp: true,
+    sendOnSignIn: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url, token }, request) => {
+      try {
+        logger.debug(`Sending email verification to ${user.email}`);
+        void sendEmail(
+          authenticationTemplates.emailVerificationTemplate({
+            email: user.email,
+            verificationUrl: url,
+            appName,
+          }),
+        );
+      } catch (error) {
+        logger.error("Failed to send email verification", { error });
+      }
+    },
+    afterEmailVerification: async (user, request) => {
+      void sendEmail(
+        authenticationTemplates.welcomeTemplate({
+          email: user.email,
+          name: user.name,
+          appName,
+        }),
+      );
+    },
+  },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false,
+    requireEmailVerification: true,
+    onExistingUserSignUp: async ({ user }, request) => {
+      logger.warn(
+        `User with email ${user.email} attempted to sign up but already exists. Consider implementing account recovery options.`,
+      );
+      
+    },
     sendResetPassword: async ({ user, url }) => {
       try {
         logger.debug(`Sending reset password email to ${user.email}`);
-        await sendEmail(
+        void sendEmail(
           authenticationTemplates.passwordResetLinkTemplate({
             email: user.email,
             resetUrl: url,
@@ -48,7 +72,7 @@ export const auth = betterAuth({
     onPasswordReset: async ({ user }) => {
       try {
         logger.debug(`Sending password update email to ${user.email}`);
-        await sendEmail(
+        void sendEmail(
           authenticationTemplates.passwordUpdateTemplate({
             email: user.email,
             name: user.name,
@@ -96,12 +120,6 @@ export const auth = betterAuth({
               ...user,
               role: safeRole,
             });
-            await sendWelcomeEmail({
-              id: user.id,
-              name: user.name,
-              email: user.email,
-              role: safeRole,
-            });
           } catch (error) {
             logger.error("Failed to post-process new user", { error });
           }
@@ -119,6 +137,16 @@ export const auth = betterAuth({
     "http://localhost:4000",
     ...(process.env.NODE_ENV === "development" ? ["*"] : []),
   ],
+  advanced: {
+    ipAddress: {
+      ipv6Subnet: 64,
+    },
+  },
+  rateLimit: {
+    enabled: true,
+    window: 60,
+    max: 100,
+  },
 });
 
 export type Session = typeof auth.$Infer.Session;
