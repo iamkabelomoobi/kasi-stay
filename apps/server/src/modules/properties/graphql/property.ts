@@ -234,7 +234,7 @@ BuyDetailRef.implement({
   }),
 });
 
-const RentDetailRef = builder.objectRef<RentDetailShape>("RentDetail");
+export const RentDetailRef = builder.objectRef<RentDetailShape>("RentDetail");
 RentDetailRef.implement({
   fields: (t) => ({
     id: t.id({ resolve: (parent) => parent.id }),
