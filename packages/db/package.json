@@ -19,6 +19,7 @@
     "check-types": "tsc -p tsconfig.json --noEmit",
     "db:validate": "npx prisma validate",
     "db:format": "npx prisma format",
+    "seed": "tsx prisma/seed.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
