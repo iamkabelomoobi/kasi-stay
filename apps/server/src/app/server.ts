@@ -10,6 +10,7 @@ import { logger } from "@kasistay/logger";
 import { config, ensurePropertySearchIndex } from "../infra";
 import { Context } from "./context";
 import { schema } from "./index";
+import { createOpenApiDocument, renderSwaggerUiHtml } from "./openapi";
 import ip from "ip";
 
 type ServerRuntime = {
@@ -47,6 +48,14 @@ export const createServerRuntime = async (): Promise<ServerRuntime> => {
       credentials: true,
     }),
   );
+
+  app.get("/openapi.json", (_req, res) => {
+    res.json(createOpenApiDocument());
+  });
+
+  app.get(["/docs", "/docs/"], (_req, res) => {
+    res.type("html").send(renderSwaggerUiHtml());
+  });
 
   app.all("/api/auth/*", toNodeHandler(auth));
   app.use(
