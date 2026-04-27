@@ -1,8 +1,11 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 
-import { AppSidebar } from "@/components/dashboard/side-bar";
-import { AppTopbar, type AppUserRole } from "@/components/dashboard/top-bar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { UserProfileFragment } from "@kasistay/client";
 
 export const dynamic = "force-dynamic";
 
@@ -20,24 +23,30 @@ export default async function DashboardLayout({
     redirect("/login?callbackURL=/dashboard");
   }
 
-  const userRole = (session.user.role ?? "RENTER") as AppUserRole;
-  const isAdmin = userRole === "ADMIN";
+  const userRole = (session.user.role ??
+    "RENTER") as UserProfileFragment["role"];
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f4f1e8] text-foreground">
-      <AppSidebar isAdmin={isAdmin} />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <AppTopbar
-          user={{
-            name: session.user.name,
-            email: session.user.email,
-            role: userRole,
-          }}
-        />
-        <main className="min-h-0 flex-1 overflow-hidden bg-[#f4f1e8]">
-          {children}
-        </main>
-      </div>
-    </div>
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar
+        user={{
+          name: session.user.name,
+          email: session.user.email,
+          avatar: session.user.image ?? undefined,
+          role: userRole,
+        }}
+      />
+      <SidebarInset>
+        <SiteHeader />
+        {children}
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
