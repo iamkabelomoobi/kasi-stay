@@ -6,6 +6,23 @@ import { logger } from "@kasistay/logger";
 import { createRoleRecord } from "../utils/create-role-record";
 
 const appName = process.env.APP_NAME || "kasistay";
+const defaultFrontendUrl = "http://localhost:3000";
+
+const resolveFrontendUrl = (): string => {
+  const configuredFrontendUrl = process.env.FRONTEND_URL?.trim();
+
+  if (!configuredFrontendUrl) return defaultFrontendUrl;
+
+  try {
+    return new URL(configuredFrontendUrl).toString();
+  } catch (error) {
+    logger.warn("Invalid FRONTEND_URL configured for auth redirects", {
+      error,
+      frontendUrl: configuredFrontendUrl,
+    });
+    return defaultFrontendUrl;
+  }
+};
 
 type AuthUser = {
   id?: string;
@@ -24,11 +41,22 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url, token }, request) => {
       try {
+        const verificationUrl = new URL(url);
+        const callbackUrl = new URL(
+          "/auth/verified",
+          resolveFrontendUrl(),
+        ).toString();
+
+        verificationUrl.searchParams.set(
+          "callbackURL",
+          callbackUrl,
+        );
+
         logger.debug(`Sending email verification to ${user.email}`);
         void sendEmail(
           authenticationTemplates.emailVerificationTemplate({
             email: user.email,
-            verificationUrl: url,
+            verificationUrl: verificationUrl.toString(),
             appName,
           }),
         );
@@ -53,7 +81,6 @@ export const auth = betterAuth({
       logger.warn(
         `User with email ${user.email} attempted to sign up but already exists. Consider implementing account recovery options.`,
       );
-      
     },
     sendResetPassword: async ({ user, url }) => {
       try {
@@ -109,15 +136,8 @@ export const auth = betterAuth({
             logger.info(
               `New user created: ${user.email} with role ${safeRole}`,
             );
-            await prisma.user.update({
-              where: { id: user.id },
-              data: {
-                emailVerified: true,
-                role: safeRole,
-              },
-            });
             await createRoleRecord({
-              ...user,
+              id: user.id,
               role: safeRole,
             });
           } catch (error) {
@@ -133,6 +153,7 @@ export const auth = betterAuth({
   },
   trustedOrigins: [
     process.env.FRONTEND_URL || "http://localhost:3000",
+    "http://localhost:3000",
     "http://127.0.0.1:4000",
     "http://localhost:4000",
     ...(process.env.NODE_ENV === "development" ? ["*"] : []),
