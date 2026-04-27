@@ -9,7 +9,7 @@ const expectOperation = (schemaText: string, operation: string) => {
   assert.match(schemaText, new RegExp(`\\b${operation}\\b`));
 };
 
-test("schema exposes the NEXTGENX backend operations", async () => {
+test("schema exposes the Kasi Stay backend operations", async () => {
   const { schema } = await import("../src/app/index.ts");
   const schemaText = printSchema(schema);
 

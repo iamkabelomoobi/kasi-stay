@@ -11,7 +11,8 @@
     }
   },
   "scripts": {
-    "bootstrap": "npm run schema:export && graphql-codegen --config codegen.ts",
+    "build:schema-deps": "npm run build --workspace @kasistay/logger && npm run build --workspace @kasistay/db && npm run build --workspace @kasistay/email && npm run build --workspace @kasistay/auth",
+    "bootstrap": "npm run build:schema-deps && npm run schema:export && graphql-codegen --config codegen.ts",
     "build": "npm run bootstrap && tsc -p tsconfig.json && node ../../scripts/fix-esm-specifiers.mjs dist",
     "check-types": "npm run bootstrap && tsc -p tsconfig.json --noEmit",
     "schema:export": "npm run schema:export --workspace @kasistay/server"
