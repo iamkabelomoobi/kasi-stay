@@ -1,7 +1,26 @@
+input AddPropertyMediaInput {
+  media: [AddPropertyMediaItemInput!]!
+}
+
+input AddPropertyMediaItemInput {
+  isPrimary: Boolean
+  order: Int
+  type: String
+  url: String!
+}
+
 type Admin {
   id: ID
   user: User
   userId: String
+}
+
+type AdminAnalyticsOverview {
+  activeSubscriptions: Int
+  openReports: Int
+  pendingProperties: Int
+  totalInquiries: Int
+  totalProperties: Int
 }
 
 input AdminUpdateInput {
@@ -10,40 +29,1166 @@ input AdminUpdateInput {
   name: String
 }
 
+input AffordabilityCalculatorInput {
+  affordabilityRatio: Float
+  annualInterestRate: Float!
+  deposit: Float
+  monthlyDebtRepayments: Float
+  monthlyExpenses: Float
+  monthlyIncome: Float!
+  termMonths: Int
+}
+
+type AffordabilityCalculatorResult {
+  disposableIncome: Float
+  estimatedPurchasePrice: Float
+  maxAffordableRepayment: Float
+  maxLoanAmount: Float
+}
+
+type Agency {
+  createdAt: Date
+  id: ID
+  licenseNumber: String
+  logo: String
+  name: String
+  ownerId: ID
+  updatedAt: Date
+}
+
+type AgencyAdvertisingRequest {
+  agencyName: String
+  budget: String
+  contactEmail: String
+  contactPhone: String
+  createdAt: Date
+  id: ID
+  message: String
+  rejectionReason: String
+  requesterEmail: String
+  requesterName: String
+  reviewedAt: Date
+  reviewedById: ID
+  status: String
+  updatedAt: Date
+  userId: ID
+  websiteUrl: String
+}
+
+input AgencyAdvertisingRequestFilterInput {
+  limit: Int
+  offset: Int
+  status: String
+}
+
+input AgencyAdvertisingRequestInput {
+  agencyName: String!
+  budget: String
+  contactEmail: String!
+  contactPhone: String
+  message: String
+  websiteUrl: String
+}
+
+input AgencyAdvertisingRequestStatusInput {
+  rejectionReason: String
+  status: String!
+}
+
+input AgencyInput {
+  licenseNumber: String
+  logo: String
+  name: String!
+  ownerId: ID
+}
+
+input AgencyUpdateInput {
+  licenseNumber: String
+  logo: String
+  name: String
+}
+
+type AgentApplication {
+  applicantEmail: String
+  applicantName: String
+  city: String
+  createdAt: Date
+  experience: String
+  id: ID
+  licenseNumber: String
+  motivation: String
+  phone: String
+  rejectionReason: String
+  reviewedAt: Date
+  reviewedById: ID
+  status: String
+  updatedAt: Date
+  userId: ID
+}
+
+input AgentApplicationFilterInput {
+  limit: Int
+  offset: Int
+  status: String
+}
+
+input AgentApplicationInput {
+  city: String
+  experience: String
+  licenseNumber: String
+  motivation: String
+  phone: String
+}
+
+type AgentSubscription {
+  agentId: ID
+  createdAt: Date
+  expiresAt: Date
+  id: ID
+  isActive: Boolean
+  plan: SubscriptionPlan
+  planId: ID
+  startsAt: Date
+  updatedAt: Date
+}
+
+type Amenity {
+  category: String
+  id: ID
+  name: String
+}
+
+input AmenityFilterInput {
+  category: String
+}
+
+input AmenityInput {
+  category: String!
+  name: String!
+}
+
+input AmenityUpdateInput {
+  category: String
+  name: String
+}
+
+type Article {
+  authorId: ID
+  authorName: String
+  category: ArticleCategory
+  categoryId: ID
+  content: String
+  coverImageUrl: String
+  createdAt: Date
+  id: ID
+  publishedAt: Date
+  slug: String
+  status: String
+  summary: String
+  title: String
+  updatedAt: Date
+}
+
+type ArticleCategory {
+  code: String
+  createdAt: Date
+  id: ID
+  name: String
+  slug: String
+  updatedAt: Date
+}
+
+input ArticleFilterInput {
+  categorySlug: String
+  limit: Int
+  offset: Int
+  q: String
+  slug: String
+  status: String
+}
+
+input ArticleInput {
+  categoryId: ID!
+  content: String!
+  coverImageUrl: String
+  slug: String
+  status: String
+  summary: String
+  title: String!
+}
+
+input ArticleUpdateInput {
+  categoryId: ID
+  content: String
+  coverImageUrl: String
+  slug: String
+  status: String
+  summary: String
+  title: String
+}
+
+input AttorneyFilterInput {
+  city: String
+  limit: Int
+  offset: Int
+  q: String
+  status: String
+}
+
+type AttorneyProfile {
+  city: String
+  createdAt: Date
+  createdById: ID
+  description: String
+  email: String
+  firmName: String
+  id: ID
+  imageUrl: String
+  name: String
+  phone: String
+  publishedAt: Date
+  slug: String
+  status: String
+  updatedAt: Date
+  websiteUrl: String
+}
+
+input AttorneyProfileInput {
+  city: String!
+  description: String
+  email: String
+  firmName: String
+  imageUrl: String
+  name: String!
+  phone: String
+  slug: String
+  status: String
+  websiteUrl: String
+}
+
+input AttorneyProfileUpdateInput {
+  city: String
+  description: String
+  email: String
+  firmName: String
+  imageUrl: String
+  name: String
+  phone: String
+  slug: String
+  status: String
+  websiteUrl: String
+}
+
+input BondCalculatorInput {
+  annualInterestRate: Float!
+  deposit: Float
+  propertyPrice: Float!
+  termMonths: Int
+}
+
+type BondCalculatorResult {
+  monthlyRepayment: Float
+  principal: Float
+  totalInterest: Float
+  totalRepayment: Float
+}
+
+type BuyDetail {
+  developerName: String
+  handoverDate: Date
+  id: ID
+  isDeveloper: Boolean
+  ownerType: String
+  ownership: String
+  paymentPlan: PaymentPlan
+  projectName: String
+  propertyId: ID
+  registrationInfo: String
+  roi: Float
+  titleDeedVerified: Boolean
+}
+
+input BuyDetailInput {
+  developerName: String
+  handoverDate: Date
+  isDeveloper: Boolean
+  ownerType: String
+  ownership: String
+  projectName: String
+  registrationInfo: String
+  roi: Float
+  titleDeedVerified: Boolean
+}
+
+type CareerPost {
+  createdAt: Date
+  createdById: ID
+  description: String
+  employmentType: String
+  id: ID
+  location: String
+  publishedAt: Date
+  slug: String
+  status: String
+  summary: String
+  title: String
+  updatedAt: Date
+}
+
+input CareerPostFilterInput {
+  limit: Int
+  location: String
+  offset: Int
+  q: String
+  status: String
+}
+
+input CareerPostInput {
+  description: String!
+  employmentType: String
+  location: String
+  slug: String
+  status: String
+  summary: String
+  title: String!
+}
+
+input CareerPostUpdateInput {
+  description: String
+  employmentType: String
+  location: String
+  slug: String
+  status: String
+  summary: String
+  title: String
+}
+
+type ContactMessage {
+  createdAt: Date
+  email: String
+  id: ID
+  message: String
+  name: String
+  phone: String
+  status: String
+  subject: String
+  updatedAt: Date
+  userId: ID
+}
+
+input ContactMessageFilterInput {
+  limit: Int
+  offset: Int
+  status: String
+}
+
+input ContactMessageInput {
+  email: String
+  message: String!
+  name: String
+  phone: String
+  subject: String!
+}
+
+type Conversation {
+  contextId: ID
+  contextType: String
+  createdAt: Date
+  createdById: ID
+  id: ID
+  lastMessageAt: Date
+  participants: [ConversationParticipant!]
+  subject: String
+  updatedAt: Date
+}
+
+input ConversationFilterInput {
+  contextId: ID
+  contextType: String
+  includeArchived: Boolean
+  limit: Int
+  offset: Int
+}
+
+type ConversationMessage {
+  body: String
+  conversationId: ID
+  createdAt: Date
+  id: ID
+  senderId: ID
+  type: String
+  updatedAt: Date
+}
+
+type ConversationParticipant {
+  archivedAt: Date
+  conversationId: ID
+  joinedAt: Date
+  lastReadAt: Date
+  userEmail: String
+  userId: ID
+  userName: String
+}
+
+input CreateConversationInput {
+  contextId: ID
+  contextType: String
+  initialMessage: String
+  participantUserIds: [ID!]!
+  subject: String
+}
+
+input CreatePropertyMediaUploadTargetInput {
+  contentType: String!
+  filename: String!
+  sizeBytes: Int!
+}
+
 scalar Date
 
+type Inquiry {
+  createdAt: Date
+  email: String
+  id: ID
+  message: String
+  name: String
+  phone: String
+  property: Property
+  propertyId: ID
+  source: String
+  status: String
+  updatedAt: Date
+  userId: ID
+}
+
+input InquiryFilterInput {
+  limit: Int
+  offset: Int
+  propertyId: ID
+  status: String
+  userId: ID
+}
+
+input InquiryInput {
+  email: String!
+  message: String
+  name: String!
+  phone: String
+  source: String
+}
+
+input InquiryStatusUpdateInput {
+  status: String!
+}
+
+type Installment {
+  amount: Float
+  dueDate: Date
+  id: ID
+  label: String
+  percentage: Float
+}
+
+type JobApplication {
+  careerPostId: ID
+  coverLetter: String
+  createdAt: Date
+  email: String
+  fullName: String
+  id: ID
+  phone: String
+  resumeUrl: String
+  updatedAt: Date
+  userId: ID
+}
+
+input JobApplicationInput {
+  coverLetter: String
+  email: String!
+  fullName: String!
+  phone: String
+  resumeUrl: String
+}
+
+type ListingBoost {
+  agentId: ID
+  createdAt: Date
+  expiresAt: Date
+  id: ID
+  property: Property
+  propertyId: ID
+  startsAt: Date
+  type: String
+  updatedAt: Date
+}
+
+input ListingBoostInput {
+  expiresAt: Date!
+  type: String!
+}
+
+type Location {
+  address: String
+  city: String
+  country: String
+  createdAt: Date
+  id: ID
+  latitude: Float
+  longitude: Float
+  neighborhood: String
+  postalCode: String
+  state: String
+  updatedAt: Date
+}
+
+type MarketplaceItem {
+  archivedAt: Date
+  category: String
+  city: String
+  condition: String
+  createdAt: Date
+  currency: String
+  description: String
+  id: ID
+  imageUrlsJson: String
+  isNegotiable: Boolean
+  locationText: String
+  ownerId: ID
+  ownerName: String
+  price: Float
+  publishedAt: Date
+  slug: String
+  status: String
+  title: String
+  updatedAt: Date
+}
+
+input MarketplaceItemFilterInput {
+  category: String
+  city: String
+  condition: String
+  limit: Int
+  maxPrice: Float
+  minPrice: Float
+  offset: Int
+  status: String
+}
+
+input MarketplaceItemInput {
+  category: String!
+  city: String!
+  condition: String
+  currency: String
+  description: String
+  imageUrlsJson: String
+  isNegotiable: Boolean
+  locationText: String
+  price: Float
+  slug: String
+  title: String!
+}
+
+input MarketplaceItemUpdateInput {
+  category: String
+  city: String
+  condition: String
+  currency: String
+  description: String
+  imageUrlsJson: String
+  isNegotiable: Boolean
+  locationText: String
+  price: Float
+  slug: String
+  status: String
+  title: String
+}
+
+type MarketplaceSavedItem {
+  item: MarketplaceItem
+  itemId: ID
+  savedAt: Date
+  userId: ID
+}
+
 type Mutation {
+  """Attach a user as an agency agent"""
+  addAgencyAgent(agencyId: ID!, agentId: ID!): Agency
+
+  """Attach media metadata to a property"""
+  addPropertyMedia(input: AddPropertyMediaInput!, propertyId: ID!): Property
+  applyAsAgent(input: AgentApplicationInput!): AgentApplication
+  approveAgentApplication(applicationId: ID!): AgentApplication
+
+  """Approve a property listing"""
+  approvePropertyForAdmin(propertyId: ID!): Property
+  archiveArticle(articleId: ID!): Article
+  archiveCareerPost(careerPostId: ID!): CareerPost
+  archiveConversation(conversationId: ID!): ConversationParticipant
+  archiveMarketplaceItem(itemId: ID!): MarketplaceItem
+
+  """Archive a property listing"""
+  archiveProperty(propertyId: ID!): Property
+  archiveStaticPage(pageId: ID!): StaticPage
+  calculateAffordability(input: AffordabilityCalculatorInput!): AffordabilityCalculatorResult
+  calculateBond(input: BondCalculatorInput!): BondCalculatorResult
+
+  """Cancel a viewing"""
+  cancelViewing(viewingId: ID!): Viewing
+
+  """Complete a confirmed viewing"""
+  completeViewing(viewingId: ID!): Viewing
+
+  """Confirm a scheduled viewing"""
+  confirmViewing(viewingId: ID!): Viewing
+
+  """Create an agency"""
+  createAgency(input: AgencyInput!): Agency
+
+  """Create an amenity"""
+  createAmenity(input: AmenityInput!): Amenity
+  createArticle(input: ArticleInput!): Article
+  createAttorneyProfile(input: AttorneyProfileInput!): AttorneyProfile
+  createCareerPost(input: CareerPostInput!): CareerPost
+  createConversation(input: CreateConversationInput!): Conversation
+
+  """Create a property inquiry"""
+  createInquiry(input: InquiryInput!, propertyId: ID!): Inquiry
+  createMarketplaceItem(input: MarketplaceItemInput!): MarketplaceItem
+
+  """Create a property listing"""
+  createProperty(input: PropertyInput!): Property
+
+  """Create a listing boost for a property"""
+  createPropertyBoost(input: ListingBoostInput!, propertyId: ID!): ListingBoost
+
+  """
+  Create a pre-signed upload target for property media stored in S3-compatible storage
+  """
+  createPropertyMediaUploadTarget(input: CreatePropertyMediaUploadTargetInput!, propertyId: ID!): PropertyMediaUploadTarget
+
+  """Report a property"""
+  createReport(input: ReportInput!, propertyId: ID!): Report
+
+  """Create or update a property review"""
+  createReview(input: ReviewInput!, propertyId: ID!): Review
+
+  """Create a saved search for the current user"""
+  createSavedSearch(input: SavedSearchInput!): SavedSearch
+  createServiceListing(input: ServiceListingInput!): ServiceListing
+  createServiceProvider(input: ServiceProviderInput!): ServiceProvider
+  createStaticPage(input: StaticPageInput!): StaticPage
+
+  """Create a subscription plan"""
+  createSubscriptionPlan(input: SubscriptionPlanInput!): SubscriptionPlan
+
   """Delete an admin profile — admin only"""
   deleteAdmin(id: ID!): Admin
+
+  """Delete an amenity"""
+  deleteAmenity(amenityId: ID!): Amenity
+  deleteArticle(articleId: ID!): Article
+  deleteAttorneyProfile(attorneyId: ID!): AttorneyProfile
+  deleteMarketplaceItem(itemId: ID!): MarketplaceItem
+
+  """Delete a notification"""
+  deleteNotification(notificationId: ID!): Boolean
+
+  """Delete a property"""
+  deleteProperty(propertyId: ID!): Property
+
+  """Delete a listing boost"""
+  deletePropertyBoost(boostId: ID!): Boolean
+
+  """Delete a property media item"""
+  deletePropertyMedia(mediaId: ID!, propertyId: ID!): Property
 
   """Delete a renter profile — admin only"""
   deleteRenter(id: ID!): Renter
 
+  """Delete a review"""
+  deleteReview(reviewId: ID!): Review
+  deleteRoommateProfile(profileId: ID!): RoommateProfile
+
+  """Delete a saved search"""
+  deleteSavedSearch(savedSearchId: ID!): Boolean
+  deleteServiceListing(listingId: ID!): ServiceListing
+
+  """Delete a subscription plan"""
+  deleteSubscriptionPlan(planId: ID!): SubscriptionPlan
+
   """Delete a user by ID — admin only"""
   deleteUser(id: ID!): User
+
+  """Duplicate a property listing into a draft"""
+  duplicateProperty(propertyId: ID!): Property
+
+  """Mark all notifications as read"""
+  markAllNotificationsRead: Boolean
+  markConversationRead(conversationId: ID!): ConversationParticipant
+
+  """Mark a notification as read"""
+  markNotificationRead(notificationId: ID!): Notification
+  publishArticle(articleId: ID!): Article
+  publishMarketplaceItem(itemId: ID!): MarketplaceItem
+
+  """Publish a property after validation"""
+  publishProperty(propertyId: ID!): Property
+  publishStaticPage(pageId: ID!): StaticPage
+  rejectAgentApplication(applicationId: ID!, rejectionReason: String): AgentApplication
+
+  """Reject and archive a property listing"""
+  rejectPropertyForAdmin(propertyId: ID!): Property
+
+  """Remove a user from an agency's agent roster"""
+  removeAgencyAgent(agencyId: ID!, agentId: ID!): Agency
+
+  """Reorder existing property media"""
+  reorderPropertyMedia(input: PropertyMediaReorderInput!, propertyId: ID!): [PropertyMedia!]
+  requestAgencyAdvertising(input: AgencyAdvertisingRequestInput!): AgencyAdvertisingRequest
+  requestService(input: ServiceRequestInput!, listingId: ID!): ServiceRequest
+
+  """Resolve a report"""
+  resolveReport(reportId: ID!): Report
+  saveMarketplaceItem(itemId: ID!): MarketplaceSavedItem
+
+  """Save a property for the current user"""
+  saveProperty(propertyId: ID!): SavedProperty
+
+  """Create or update the buy detail for a property"""
+  savePropertyBuyDetail(input: BuyDetailInput!, propertyId: ID!): BuyDetail
+
+  """Create or replace the buy payment plan for a property"""
+  savePropertyBuyPaymentPlan(input: PaymentPlanInput!, propertyId: ID!): PaymentPlan
+
+  """Create or update the rent detail for a property"""
+  savePropertyRentDetail(input: RentDetailInput!, propertyId: ID!): RentDetail
+
+  """Create or update the sell detail for a property"""
+  savePropertySellDetail(input: SellDetailInput!, propertyId: ID!): SellDetail
+  saveRoommateProfile(profileId: ID!): RoommateSavedProfile
+
+  """Schedule a viewing for an inquiry"""
+  scheduleViewing(input: ScheduleViewingInput!, inquiryId: ID!): Viewing
+  sendMessage(conversationId: ID!, input: SendMessageInput!): ConversationMessage
+
+  """Mark one media item as the primary property media"""
+  setPrimaryPropertyMedia(mediaId: ID!, propertyId: ID!): PropertyMedia
+  submitContactMessage(input: ContactMessageInput!): ContactMessage
+  submitJobApplication(careerPostId: ID!, input: JobApplicationInput!): JobApplication
+
+  """Subscribe an agent or owner to a plan"""
+  subscribeToPlan(input: SubscribeToPlanInput!): AgentSubscription
+
+  """Toggle alerts for a saved search"""
+  toggleSavedSearchAlert(savedSearchId: ID!): SavedSearch
+
+  """Increment a property view counter"""
+  trackPropertyView(propertyId: ID!): Property
+  unsaveMarketplaceItem(itemId: ID!): Boolean
+
+  """Remove a property from the current user's saved list"""
+  unsaveProperty(propertyId: ID!): Boolean
+  unsaveRoommateProfile(profileId: ID!): Boolean
 
   """Update an admin profile — admin only"""
   updateAdmin(id: ID!, input: AdminUpdateInput!): Admin
 
+  """Update an agency"""
+  updateAgency(agencyId: ID!, input: AgencyUpdateInput!): Agency
+  updateAgencyAdvertisingRequestStatus(input: AgencyAdvertisingRequestStatusInput!, requestId: ID!): AgencyAdvertisingRequest
+
+  """Update an amenity"""
+  updateAmenity(amenityId: ID!, input: AmenityUpdateInput!): Amenity
+  updateArticle(articleId: ID!, input: ArticleUpdateInput!): Article
+  updateAttorneyProfile(attorneyId: ID!, input: AttorneyProfileUpdateInput!): AttorneyProfile
+  updateCareerPost(careerPostId: ID!, input: CareerPostUpdateInput!): CareerPost
+
+  """Update inquiry status"""
+  updateInquiryStatus(input: InquiryStatusUpdateInput!, inquiryId: ID!): Inquiry
+  updateMarketplaceItem(input: MarketplaceItemUpdateInput!, itemId: ID!): MarketplaceItem
+
+  """Update an existing property"""
+  updateProperty(input: PropertyUpdateInput!, propertyId: ID!): Property
+
   """Update a renter profile — admin or self"""
   updateRenter(id: ID!, input: RenterUpdateInput!): Renter
+  updateServiceListing(input: ServiceListingUpdateInput!, listingId: ID!): ServiceListing
+  updateServiceProvider(input: ServiceProviderUpdateInput!, providerId: ID!): ServiceProvider
+  updateServiceRequestStatus(input: ServiceRequestStatusInput!, requestId: ID!): ServiceRequest
+  updateStaticPage(input: StaticPageUpdateInput!, pageId: ID!): StaticPage
+
+  """Update a subscription plan"""
+  updateSubscriptionPlan(input: SubscriptionPlanUpdateInput!, planId: ID!): SubscriptionPlan
 
   """Update a user — admin or self only"""
   updateUser(id: ID!, input: UserUpdateInput!): User
+
+  """Create or update a property's buy detail"""
+  upsertBuyDetail(input: BuyDetailInput!, propertyId: ID!): BuyDetail
+
+  """Create or replace a property's buy payment plan"""
+  upsertPropertyPaymentPlan(input: PaymentPlanInput!, propertyId: ID!): PaymentPlan
+
+  """Create or update a property's rent detail"""
+  upsertRentDetail(input: RentDetailInput!, propertyId: ID!): RentDetail
+  upsertRoommateProfile(input: RoommateProfileInput!): RoommateProfile
+
+  """Create or update a property's sell detail"""
+  upsertSellDetail(input: SellDetailInput!, propertyId: ID!): SellDetail
+}
+
+type Notification {
+  body: String
+  createdAt: Date
+  id: ID
+  isRead: Boolean
+  metadataJson: String
+  title: String
+  type: String
+  updatedAt: Date
+  userId: ID
+}
+
+input NotificationFilterInput {
+  limit: Int
+  offset: Int
+  unreadOnly: Boolean
+}
+
+type PaymentPlan {
+  createdAt: Date
+  id: ID
+  installments: [Installment!]
+  updatedAt: Date
+}
+
+input PaymentPlanInput {
+  installments: [PaymentPlanInstallmentInput!]!
+}
+
+input PaymentPlanInstallmentInput {
+  amount: Float!
+  dueDate: Date!
+  label: String
+  percentage: Float
+}
+
+type PriceHistory {
+  changedAt: Date
+  id: ID
+  price: Float
+  propertyId: ID
+}
+
+type Property {
+  amenities: [PropertyAmenity!]
+  availableFrom: Date
+  bathrooms: Int
+  bedrooms: Int
+  builtUpArea: Float
+  buyDetail: BuyDetail
+  createdAt: Date
+  currency: String
+  description: String
+  documents: [PropertyDocument!]
+  expiresAt: Date
+  floorNumber: Int
+  furnishing: String
+  id: ID
+  isFeatured: Boolean
+  isVerified: Boolean
+  listingType: String
+  location: Location
+  media: [PropertyMedia!]
+  occupancyStatus: String
+  parkingSpaces: Int
+  permitNumber: String
+  plotArea: Float
+  price: Float
+  priceFrequency: String
+  priceHistory: [PriceHistory!]
+  propertyType: String
+  rentDetail: RentDetail
+  sellDetail: SellDetail
+  slug: String
+  status: String
+  title: String
+  totalFloors: Int
+  updatedAt: Date
+  views: Int
+  yearBuilt: Int
+}
+
+type PropertyAmenity {
+  amenity: Amenity
+  amenityId: ID
+  propertyId: ID
+}
+
+type PropertyAnalytics {
+  inquiries: Int
+  reviews: Int
+  viewings: Int
+  views: Int
+}
+
+type PropertyDocument {
+  id: ID
+  label: String
+  type: String
+  url: String
+}
+
+input PropertyDocumentInput {
+  label: String
+  type: String
+  url: String!
+}
+
+input PropertyFilterInput {
+  agencyId: ID
+  agentId: ID
+  bathrooms: Int
+  bedrooms: Int
+  city: String
+  isFeatured: Boolean
+  limit: Int
+  listingType: String
+  maxArea: Float
+  maxPrice: Float
+  minArea: Float
+  minPrice: Float
+  offset: Int
+  propertyType: String
+  q: String
+  status: String
+}
+
+input PropertyInput {
+  agencyId: ID
+  agentId: ID
+  amenityIds: [ID!]
+  availableFrom: Date
+  bathrooms: Int
+  bedrooms: Int
+  builtUpArea: Float
+  currency: String
+  description: String
+  documents: [PropertyDocumentInput!]
+  expiresAt: Date
+  floorNumber: Int
+  furnishing: String
+  listingType: String!
+  location: PropertyLocationInput
+  media: [PropertyMediaInput!]
+  occupancyStatus: String
+  parkingSpaces: Int
+  permitNumber: String
+  plotArea: Float
+  price: Float
+  priceFrequency: String
+  propertyType: String!
+  title: String!
+  totalFloors: Int
+  yearBuilt: Int
+}
+
+input PropertyLocationInput {
+  address: String!
+  city: String!
+  country: String!
+  geoJson: String
+  latitude: Float
+  longitude: Float
+  neighborhood: String
+  postalCode: String
+  state: String
+}
+
+type PropertyMedia {
+  createdAt: Date
+  id: ID
+  isPrimary: Boolean
+  order: Int
+  type: String
+  updatedAt: Date
+  url: String
+}
+
+input PropertyMediaInput {
+  isPrimary: Boolean
+  order: Int
+  type: String
+  url: String!
+}
+
+input PropertyMediaReorderInput {
+  items: [PropertyMediaReorderItemInput!]!
+}
+
+input PropertyMediaReorderItemInput {
+  mediaId: ID!
+  order: Int!
+}
+
+type PropertyMediaUploadTarget {
+  contentType: String
+  expiresInSeconds: Int
+  key: String
+  publicUrl: String
+  uploadUrl: String
+}
+
+input PropertySearchInput {
+  agencyId: ID
+  agentId: ID
+  bathrooms: Int
+  bedrooms: Int
+  city: String
+  isFeatured: Boolean
+  latitude: Float
+  limit: Int
+  listingType: String
+  longitude: Float
+  maxArea: Float
+  maxPrice: Float
+  minArea: Float
+  minPrice: Float
+  offset: Int
+  propertyType: String
+  q: String
+  radiusKm: Float
+  sort: String
+  status: String
+}
+
+input PropertyUpdateInput {
+  agencyId: ID
+  agentId: ID
+  amenityIds: [ID!]
+  availableFrom: Date
+  bathrooms: Int
+  bedrooms: Int
+  builtUpArea: Float
+  currency: String
+  description: String
+  documents: [PropertyDocumentInput!]
+  expiresAt: Date
+  floorNumber: Int
+  furnishing: String
+  location: PropertyLocationInput
+  media: [PropertyMediaInput!]
+  occupancyStatus: String
+  parkingSpaces: Int
+  permitNumber: String
+  plotArea: Float
+  price: Float
+  priceFrequency: String
+  propertyType: String
+  title: String
+  totalFloors: Int
+  yearBuilt: Int
 }
 
 type Query {
   """Get an admin profile by ID — admin only"""
   admin(id: ID!): Admin
 
+  """Return aggregate admin dashboard metrics"""
+  adminAnalyticsOverview: AdminAnalyticsOverview
+
+  """List properties pending admin approval"""
+  adminPendingProperties: [Property!]
+
   """Get all admin profiles — admin only"""
   admins: [Admin!]
 
+  """Fetch a single agency by ID"""
+  agency(agencyId: ID!): Agency
+  agencyAdvertisingRequests(filter: AgencyAdvertisingRequestFilterInput): [AgencyAdvertisingRequest!]
+
+  """List amenities, optionally filtered by category"""
+  amenities(filter: AmenityFilterInput): [Amenity!]
+
+  """Fetch an article by ID"""
+  article(articleId: ID!): Article
+
+  """Fetch an article by slug"""
+  articleBySlug(slug: String!): Article
+
+  """List article categories"""
+  articleCategories: [ArticleCategory!]
+
+  """List published articles or all articles for admins"""
+  articles(filter: ArticleFilterInput): [Article!]
+  attorney(attorneyId: ID!): AttorneyProfile
+  attorneys(filter: AttorneyFilterInput): [AttorneyProfile!]
+  careerPost(careerPostId: ID!): CareerPost
+  careerPosts(filter: CareerPostFilterInput): [CareerPost!]
+  contactMessages(filter: ContactMessageFilterInput): [ContactMessage!]
+  conversation(conversationId: ID!): Conversation
+  conversations(filter: ConversationFilterInput): [Conversation!]
+
+  """List inquiries visible to the current user"""
+  inquiries(filter: InquiryFilterInput): [Inquiry!]
+
+  """Fetch a single inquiry by ID"""
+  inquiry(inquiryId: ID!): Inquiry
+  marketplaceItem(itemId: ID!): MarketplaceItem
+  marketplaceItems(filter: MarketplaceItemFilterInput): [MarketplaceItem!]
+
   """Get the currently authenticated user"""
   me: User
+  messages(conversationId: ID!, limit: Int, offset: Int): [ConversationMessage!]
+  myMarketplaceItems: [MarketplaceItem!]
 
   """Get the current renter profile"""
   myProfile: Renter
+  myRoommateProfile: RoommateProfile
+  myServiceRequests: [ServiceRequest!]
+
+  """List subscriptions for the current agent or owner"""
+  mySubscriptions: [AgentSubscription!]
+
+  """List notifications for the current user"""
+  notifications(filter: NotificationFilterInput): [Notification!]
+  professionalApplications(filter: AgentApplicationFilterInput): [AgentApplication!]
+
+  """List properties with filtering"""
+  properties(filter: PropertyFilterInput): [Property!]
+
+  """Fetch a property by slug"""
+  property(slug: String!): Property
+
+  """Return aggregate property analytics"""
+  propertyAnalytics(propertyId: ID!): PropertyAnalytics
+
+  """List boosts for a property"""
+  propertyBoosts(propertyId: ID!): [ListingBoost!]
+
+  """Fetch the buy detail for a property"""
+  propertyBuyDetail(propertyId: ID!): BuyDetail
+
+  """List media for a property"""
+  propertyMedia(propertyId: ID!): [PropertyMedia!]
+
+  """List property price history entries"""
+  propertyPriceHistory(propertyId: ID!): [PriceHistory!]
+
+  """Fetch the rent detail for a property"""
+  propertyRentDetail(propertyId: ID!): RentDetail
+
+  """List reviews for a property"""
+  propertyReviews(propertyId: ID!): [Review!]
+
+  """Search properties with text, structured, and geo filters"""
+  propertySearch(filter: PropertySearchInput): [Property!]
+
+  """Fetch the sell detail for a property"""
+  propertySellDetail(propertyId: ID!): SellDetail
+
+  """Fetch sell price history for a property"""
+  propertySellPriceHistory(propertyId: ID!): [PriceHistory!]
 
   """Get a renter profile by ID — admin or self"""
   renter(id: ID!): Renter
@@ -51,11 +1196,67 @@ type Query {
   """Get all renter profiles — admin only"""
   renters(search: RenterSearchInput): [Renter!]
 
+  """List reports for moderation"""
+  reports(filter: ReportFilterInput): [Report!]
+  roommateProfile(profileId: ID!): RoommateProfile
+  roommateProfiles(filter: RoommateProfileFilterInput): [RoommateProfile!]
+  savedMarketplaceItems: [MarketplaceSavedItem!]
+
+  """List saved properties for the current user"""
+  savedProperties: [SavedProperty!]
+  savedRoommateProfiles: [RoommateSavedProfile!]
+
+  """List saved searches for the current user"""
+  savedSearches: [SavedSearch!]
+  serviceListing(listingId: ID!): ServiceListing
+  serviceListings(filter: ServiceListingFilterInput): [ServiceListing!]
+  serviceProvider(providerId: ID!): ServiceProvider
+  serviceProviders(filter: ServiceProviderFilterInput): [ServiceProvider!]
+
+  """Find similar published properties"""
+  similarProperties(limit: Int, propertyId: ID!): [Property!]
+  staticPage(pageId: ID!): StaticPage
+  staticPageBySlug(slug: String!): StaticPage
+  staticPages(filter: StaticPageFilterInput): [StaticPage!]
+
+  """List available subscription plans"""
+  subscriptionPlans: [SubscriptionPlan!]
+
   """Get a user by ID — admin only"""
   user(id: ID!): User
 
   """Get all users — admin only"""
   users(search: UserSearchInput): [User!]
+
+  """Fetch a single viewing by ID"""
+  viewing(viewingId: ID!): Viewing
+
+  """List viewings visible to the current user"""
+  viewings(filter: ViewingFilterInput): [Viewing!]
+}
+
+type RentDetail {
+  cheques: Int
+  chillerIncluded: Boolean
+  depositAmount: Float
+  id: ID
+  maintenanceBy: String
+  minLeaseTerm: Int
+  petsAllowed: Boolean
+  propertyId: ID
+  tenantPreference: String
+  utilitiesIncluded: Boolean
+}
+
+input RentDetailInput {
+  cheques: Int
+  chillerIncluded: Boolean
+  depositAmount: Float
+  maintenanceBy: String
+  minLeaseTerm: Int
+  petsAllowed: Boolean
+  tenantPreference: String
+  utilitiesIncluded: Boolean
 }
 
 type Renter {
@@ -75,6 +1276,356 @@ input RenterUpdateInput {
   email: String
   image: String
   name: String
+}
+
+type Report {
+  createdAt: Date
+  description: String
+  id: ID
+  property: Property
+  propertyId: ID
+  reason: String
+  status: String
+  updatedAt: Date
+  userId: ID
+}
+
+input ReportFilterInput {
+  status: String
+}
+
+input ReportInput {
+  description: String
+  reason: String!
+}
+
+type Review {
+  comment: String
+  createdAt: Date
+  id: ID
+  property: Property
+  propertyId: ID
+  rating: Int
+  updatedAt: Date
+  userId: ID
+}
+
+input ReviewInput {
+  comment: String
+  rating: Int!
+}
+
+type RoommateProfile {
+  age: Int
+  area: String
+  bio: String
+  budgetMax: Float
+  budgetMin: Float
+  city: String
+  createdAt: Date
+  currency: String
+  gender: String
+  headline: String
+  id: ID
+  moveInDate: Date
+  occupation: String
+  ownerName: String
+  petsFriendly: Boolean
+  photoUrl: String
+  preferredGender: String
+  smokingFriendly: Boolean
+  status: String
+  updatedAt: Date
+  userId: ID
+}
+
+input RoommateProfileFilterInput {
+  city: String
+  limit: Int
+  maxBudget: Float
+  minBudget: Float
+  moveInDate: Date
+  offset: Int
+  petsFriendly: Boolean
+  preferredGender: String
+  smokingFriendly: Boolean
+  status: String
+}
+
+input RoommateProfileInput {
+  age: Int
+  area: String
+  bio: String
+  budgetMax: Float
+  budgetMin: Float
+  city: String!
+  currency: String
+  gender: String
+  headline: String
+  moveInDate: Date
+  occupation: String
+  petsFriendly: Boolean
+  photoUrl: String
+  preferredGender: String
+  smokingFriendly: Boolean
+  status: String
+}
+
+type RoommateSavedProfile {
+  profile: RoommateProfile
+  profileId: ID
+  savedAt: Date
+  userId: ID
+}
+
+type SavedProperty {
+  property: Property
+  propertyId: ID
+  savedAt: Date
+  userId: ID
+}
+
+type SavedSearch {
+  alertEnabled: Boolean
+  createdAt: Date
+  filtersJson: String
+  id: ID
+  lastNotifiedAt: Date
+  updatedAt: Date
+  userId: ID
+}
+
+input SavedSearchInput {
+  alertEnabled: Boolean
+  filtersJson: String!
+}
+
+input ScheduleViewingInput {
+  scheduledAt: Date!
+}
+
+type SellDetail {
+  commissionPaidBy: String
+  id: ID
+  inspectionStatus: String
+  isOffMarket: Boolean
+  priceHistory: [PriceHistory!]
+  propertyId: ID
+  sellerType: String
+}
+
+input SellDetailInput {
+  commissionPaidBy: String
+  inspectionStatus: String
+  isOffMarket: Boolean
+  sellerType: String
+}
+
+input SendMessageInput {
+  body: String!
+}
+
+type ServiceListing {
+  category: String
+  city: String
+  createdAt: Date
+  currency: String
+  description: String
+  id: ID
+  imageUrlsJson: String
+  provider: ServiceProvider
+  providerId: ID
+  publishedAt: Date
+  serviceArea: String
+  slug: String
+  startingPrice: Float
+  status: String
+  title: String
+  updatedAt: Date
+}
+
+input ServiceListingFilterInput {
+  category: String
+  city: String
+  limit: Int
+  offset: Int
+  providerId: ID
+  status: String
+}
+
+input ServiceListingInput {
+  category: String!
+  city: String!
+  currency: String
+  description: String
+  imageUrlsJson: String
+  providerId: ID
+  serviceArea: String
+  slug: String
+  startingPrice: Float
+  status: String
+  title: String!
+}
+
+input ServiceListingUpdateInput {
+  category: String
+  city: String
+  currency: String
+  description: String
+  imageUrlsJson: String
+  serviceArea: String
+  slug: String
+  startingPrice: Float
+  status: String
+  title: String
+}
+
+type ServiceProvider {
+  businessName: String
+  city: String
+  createdAt: Date
+  description: String
+  email: String
+  id: ID
+  isVerified: Boolean
+  logoUrl: String
+  ownerName: String
+  phone: String
+  serviceArea: String
+  slug: String
+  status: String
+  updatedAt: Date
+  userId: ID
+}
+
+input ServiceProviderFilterInput {
+  city: String
+  limit: Int
+  offset: Int
+  q: String
+  status: String
+}
+
+input ServiceProviderInput {
+  businessName: String!
+  city: String!
+  description: String
+  email: String
+  logoUrl: String
+  phone: String
+  serviceArea: String
+  slug: String
+  status: String
+}
+
+input ServiceProviderUpdateInput {
+  businessName: String
+  city: String
+  description: String
+  email: String
+  logoUrl: String
+  phone: String
+  serviceArea: String
+  slug: String
+  status: String
+}
+
+type ServiceRequest {
+  createdAt: Date
+  id: ID
+  listing: ServiceListing
+  listingId: ID
+  message: String
+  preferredDate: Date
+  requesterId: ID
+  requesterName: String
+  status: String
+  updatedAt: Date
+}
+
+input ServiceRequestInput {
+  message: String
+  preferredDate: Date
+}
+
+input ServiceRequestStatusInput {
+  status: String!
+}
+
+type StaticPage {
+  content: String
+  createdAt: Date
+  createdById: ID
+  id: ID
+  publishedAt: Date
+  slug: String
+  status: String
+  summary: String
+  title: String
+  type: String
+  updatedAt: Date
+}
+
+input StaticPageFilterInput {
+  limit: Int
+  offset: Int
+  q: String
+  slug: String
+  status: String
+  type: String
+}
+
+input StaticPageInput {
+  content: String!
+  slug: String!
+  status: String
+  summary: String
+  title: String!
+  type: String
+}
+
+input StaticPageUpdateInput {
+  content: String
+  slug: String
+  status: String
+  summary: String
+  title: String
+  type: String
+}
+
+input SubscribeToPlanInput {
+  agentId: ID
+  planId: ID!
+}
+
+type SubscriptionPlan {
+  boostCredits: Int
+  createdAt: Date
+  durationDays: Int
+  featuresJson: String
+  id: ID
+  listingLimit: Int
+  name: String
+  price: Float
+  updatedAt: Date
+}
+
+input SubscriptionPlanInput {
+  boostCredits: Int!
+  durationDays: Int!
+  featuresJson: String
+  listingLimit: Int!
+  name: String!
+  price: Float!
+}
+
+input SubscriptionPlanUpdateInput {
+  boostCredits: Int
+  durationDays: Int
+  featuresJson: String
+  listingLimit: Int
+  name: String
+  price: Float
 }
 
 type User {
@@ -97,4 +1648,24 @@ input UserUpdateInput {
   email: String
   image: String
   name: String
+}
+
+type Viewing {
+  createdAt: Date
+  id: ID
+  inquiryId: ID
+  property: Property
+  propertyId: ID
+  scheduledAt: Date
+  status: String
+  updatedAt: Date
+  userId: ID
+}
+
+input ViewingFilterInput {
+  inquiryId: ID
+  limit: Int
+  offset: Int
+  propertyId: ID
+  status: String
 }
