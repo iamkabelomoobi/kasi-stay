@@ -30,6 +30,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: ${PORT:-4000}
@@ -39,6 +41,9 @@ services:
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB_PROD}
+      REDIS_URL: redis://redis:6379
+      SEARCH_PROVIDER: ${SEARCH_PROVIDER:-elasticsearch}
+      ELASTICSEARCH_URL: http://elasticsearch:9200
     ports:
       - "${SERVER_PORT:-4000}:${PORT:-4000}"
 
@@ -75,11 +80,48 @@ services:
       timeout: 5s
       retries: 5
 
+  elasticsearch:
+    image: ${ELASTICSEARCH_IMAGE}
+    container_name: ${ELASTICSEARCH_CONTAINER_PROD}
+    restart: unless-stopped
+    ports:
+      - "${ELASTICSEARCH_PORT}:9200"
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    volumes:
+      - ${ELASTICSEARCH_VOLUME_PROD}:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+
+  kibana:
+    image: ${KIBANA_IMAGE}
+    container_name: ${KIBANA_CONTAINER_PROD}
+    restart: unless-stopped
+    ports:
+      - "${KIBANA_PORT}:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
 volumes:
   postgres_data_prod:
     name: ${POSTGRES_VOLUME_PROD}
   redis_data_prod:
     name: ${REDIS_VOLUME_PROD}
+  elasticsearch_data_prod:
+    name: ${ELASTICSEARCH_VOLUME_PROD}
 
 networks:
   default:
