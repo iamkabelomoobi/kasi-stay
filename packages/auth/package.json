@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && node ../../scripts/fix-esm-specifiers.mjs dist",
     "check-types": "tsc -p tsconfig.json --noEmit",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "DATABASE_URL=postgresql://kasistay:kasistay@127.0.0.1:5432/kasistay_dev node --import tsx --test tests/*.test.ts"
   },
   "keywords": [],
   "author": "",

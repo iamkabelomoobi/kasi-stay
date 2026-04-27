@@ -14,8 +14,8 @@
     "restart:pm2": "pm2 restart ecosystem.config.cjs",
     "stop:pm2": "pm2 delete ecosystem.config.cjs",
     "check-types": "tsc --noEmit",
-    "test": "node --import tsx --test tests/**/*.test.ts",
-    "test:integration": "RUN_SERVER_INTEGRATION_TESTS=1 node --import tsx --test tests/**/*.test.ts"
+    "test": "DATABASE_URL=postgresql://kasistay:kasistay@127.0.0.1:5432/kasistay_dev node --import tsx --test tests/*.test.ts",
+    "test:integration": "DATABASE_URL=postgresql://kasistay:kasistay@127.0.0.1:5432/kasistay_dev RUN_SERVER_INTEGRATION_TESTS=1 node --import tsx --test tests/*.test.ts"
   },
   "keywords": [],
   "author": "",
