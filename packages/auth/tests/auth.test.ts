@@ -1,16 +1,30 @@
 import assert from "node:assert/strict";
-import { mock, test } from "node:test";
+import { test } from "node:test";
+import { prisma, UserRole } from "@kasistay/db";
+import { createRoleRecord } from "../src/utils/create-role-record.ts";
 
-test("signup post-processing sends a welcome email after provisioning the customer role", async () => {
-  process.env.APP_NAME = "kasistay Test";
-
-  const sendEmailCalls: Array<Record<string, unknown>> = [];
+test("createRoleRecord defaults invalid roles to renter and provisions renter state", async () => {
+  const originalTransaction = prisma.$transaction.bind(prisma);
   const userUpdates: Array<Record<string, unknown>> = [];
-  const customerUpserts: Array<Record<string, unknown>> = [];
+  const renterCreates: Array<Record<string, unknown>> = [];
 
-  mock.module("@kasistay/db", {
-    namedExports: {
-      prisma: {
+  Object.assign(prisma, {
+    $transaction: async (
+      callback: (tx: {
+        user: {
+          update: (args: Record<string, unknown>) => Promise<unknown>;
+        };
+        admin: {
+          deleteMany: (args: Record<string, unknown>) => Promise<unknown>;
+          create: (args: Record<string, unknown>) => Promise<unknown>;
+        };
+        renter: {
+          deleteMany: (args: Record<string, unknown>) => Promise<unknown>;
+          create: (args: Record<string, unknown>) => Promise<unknown>;
+        };
+      }) => Promise<unknown>,
+    ) =>
+      callback({
         user: {
           update: async (args: Record<string, unknown>) => {
             userUpdates.push(args);
@@ -18,122 +32,39 @@ test("signup post-processing sends a welcome email after provisioning the custom
           },
         },
         admin: {
-          upsert: async (_args: Record<string, unknown>) => undefined,
+          deleteMany: async () => undefined,
+          create: async () => undefined,
         },
-        customer: {
-          upsert: async (args: Record<string, unknown>) => {
-            customerUpserts.push(args);
+        renter: {
+          deleteMany: async () => undefined,
+          create: async (args: Record<string, unknown>) => {
+            renterCreates.push(args);
             return args;
           },
         },
-      },
-      UserRole: {
-        ADMIN: "ADMIN",
-        CUSTOMER: "CUSTOMER",
-      },
-    },
-  });
-
-  mock.module("@kasistay/email", {
-    namedExports: {
-      sendEmail: async (payload: Record<string, unknown>) => {
-        sendEmailCalls.push(payload);
-      },
-      authenticationTemplates: {
-        welcomeTemplate: ({
-          email,
-          name,
-          appName,
-        }: {
-          email: string;
-          name: string;
-          appName: string;
-        }) => ({
-          to: email,
-          subject: `Welcome to ${appName}`,
-          html: `<p>Hello ${name}</p>`,
-          text: `Hello ${name}`,
-        }),
-        passwordResetLinkTemplate: () => ({
-          to: "unused@example.com",
-          subject: "unused",
-          html: "",
-          text: "",
-        }),
-        passwordUpdateTemplate: () => ({
-          to: "unused@example.com",
-          subject: "unused",
-          html: "",
-          text: "",
-        }),
-      },
-    },
-  });
-
-  mock.module("@kasistay/logger", {
-    namedExports: {
-      logger: {
-        warn: () => undefined,
-        info: () => undefined,
-        error: () => undefined,
-        debug: () => undefined,
-      },
-    },
-  });
-
-  let authOptions:
-    | {
-        databaseHooks?: {
-          user?: {
-            create?: {
-              after?: (user: Record<string, unknown>) => Promise<void>;
-            };
-          };
-        };
-      }
-    | undefined;
-
-  mock.module("better-auth", {
-    namedExports: {
-      betterAuth: (options: typeof authOptions) => {
-        authOptions = options;
-
-        return {
-          api: {},
-          $Infer: {
-            Session: {
-              user: {},
-            },
-          },
-        };
-      },
-    },
-  });
-
-  mock.module("better-auth/adapters/prisma", {
-    namedExports: {
-      prismaAdapter: () => ({
-        provider: "postgresql",
       }),
+  });
+
+  try {
+    await createRoleRecord({
+      id: "user-1",
+      role: "NOT_A_REAL_ROLE",
+    });
+  } finally {
+    Object.assign(prisma, {
+      $transaction: originalTransaction,
+    });
+  }
+
+  assert.deepEqual(userUpdates, [
+    {
+      where: { id: "user-1" },
+      data: { role: UserRole.RENTER },
     },
-  });
-
-  await import("../src/libs/auth.ts");
-
-  const afterCreate = authOptions?.databaseHooks?.user?.create?.after;
-
-  assert.ok(afterCreate);
-
-  await afterCreate({
-    id: "user_123",
-    name: "signup-user",
-    email: "signup@example.com",
-    role: "CUSTOMER",
-  });
-
-  assert.equal(userUpdates.length, 1);
-  assert.equal(customerUpserts.length, 1);
-  assert.equal(sendEmailCalls.length, 1);
-  assert.equal(sendEmailCalls[0]?.to, "signup@example.com");
-  assert.match(String(sendEmailCalls[0]?.subject), /welcome/i);
+  ]);
+  assert.deepEqual(renterCreates, [
+    {
+      data: { userId: "user-1" },
+    },
+  ]);
 });

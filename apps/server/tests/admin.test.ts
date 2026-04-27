@@ -8,7 +8,7 @@ import {
 
 let harness: IntegrationHarness;
 let adminFixture: Awaited<ReturnType<IntegrationHarness["createFixtureUser"]>>;
-let customerFixture: Awaited<ReturnType<IntegrationHarness["createFixtureUser"]>>;
+let renterFixture: Awaited<ReturnType<IntegrationHarness["createFixtureUser"]>>;
 
 if (!runIntegrationTests) {
   test("admin integration tests are skipped without RUN_SERVER_INTEGRATION_TESTS=1");
@@ -16,7 +16,7 @@ if (!runIntegrationTests) {
   before(async () => {
     harness = await createIntegrationHarness();
     adminFixture = await harness.createFixtureUser("ADMIN");
-    customerFixture = await harness.createFixtureUser("CUSTOMER");
+    renterFixture = await harness.createFixtureUser("RENTER");
   });
 
   after(async () => {
@@ -76,10 +76,10 @@ if (!runIntegrationTests) {
     assert.equal(updateResult.body.data.updateAdmin.user.name, "admin-updated");
   });
 
-  test("admin GraphQL endpoints reject customer access", { concurrency: false }, async () => {
-    const customerCookies = await harness.signIn(
-      customerFixture.email,
-      customerFixture.password,
+  test("admin GraphQL endpoints reject renter access", { concurrency: false }, async () => {
+    const renterCookies = await harness.signIn(
+      renterFixture.email,
+      renterFixture.password,
     );
 
     const result = await harness.graphql(
@@ -91,7 +91,7 @@ if (!runIntegrationTests) {
         }
       `,
       {},
-      customerCookies,
+      renterCookies,
     );
 
     assert.equal(result.response.status, 200);

@@ -8,7 +8,7 @@ import {
 
 let harness: IntegrationHarness;
 let adminFixture: Awaited<ReturnType<IntegrationHarness["createFixtureUser"]>>;
-let customerFixture: Awaited<ReturnType<IntegrationHarness["createFixtureUser"]>>;
+let renterFixture: Awaited<ReturnType<IntegrationHarness["createFixtureUser"]>>;
 
 if (!runIntegrationTests) {
   test("user integration tests are skipped without RUN_SERVER_INTEGRATION_TESTS=1");
@@ -16,14 +16,14 @@ if (!runIntegrationTests) {
   before(async () => {
     harness = await createIntegrationHarness();
     adminFixture = await harness.createFixtureUser("ADMIN");
-    customerFixture = await harness.createFixtureUser("CUSTOMER");
+    renterFixture = await harness.createFixtureUser("RENTER");
   });
 
   after(async () => {
     await harness?.close();
   });
 
-  test("user endpoints allow admin listing and customer self-update", { concurrency: false }, async () => {
+  test("user endpoints allow admin listing and renter self-update", { concurrency: false }, async () => {
     const adminCookies = await harness.signIn(adminFixture.email, adminFixture.password);
     const usersResult = await harness.graphql(
       `
@@ -38,7 +38,7 @@ if (!runIntegrationTests) {
       `,
       {
         search: {
-          email: customerFixture.email,
+          email: renterFixture.email,
         },
       },
       adminCookies,
@@ -48,13 +48,13 @@ if (!runIntegrationTests) {
     assert.equal(usersResult.body.errors, undefined);
     assert.ok(
       usersResult.body.data.users.some(
-        (user: { id: string }) => user.id === customerFixture.userId,
+        (user: { id: string }) => user.id === renterFixture.userId,
       ),
     );
 
-    const customerCookies = await harness.signIn(
-      customerFixture.email,
-      customerFixture.password,
+    const renterCookies = await harness.signIn(
+      renterFixture.email,
+      renterFixture.password,
     );
 
     const updateUserResult = await harness.graphql(
@@ -67,12 +67,12 @@ if (!runIntegrationTests) {
         }
       `,
       {
-        id: customerFixture.userId,
+        id: renterFixture.userId,
         input: {
           name: "user-self-updated",
         },
       },
-      customerCookies,
+      renterCookies,
     );
 
     assert.equal(updateUserResult.response.status, 200);

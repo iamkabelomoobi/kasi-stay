@@ -7,24 +7,24 @@ import {
 } from "./helpers.ts";
 
 let harness: IntegrationHarness;
-let customerFixture: Awaited<ReturnType<IntegrationHarness["createFixtureUser"]>>;
+let renterFixture: Awaited<ReturnType<IntegrationHarness["createFixtureUser"]>>;
 
 if (!runIntegrationTests) {
-  test("customer integration tests are skipped without RUN_SERVER_INTEGRATION_TESTS=1");
+  test("renter integration tests are skipped without RUN_SERVER_INTEGRATION_TESTS=1");
 } else {
   before(async () => {
     harness = await createIntegrationHarness();
-    customerFixture = await harness.createFixtureUser("CUSTOMER");
+    renterFixture = await harness.createFixtureUser("RENTER");
   });
 
   after(async () => {
     await harness?.close();
   });
 
-  test("customer endpoints allow a customer to read and update their profile", { concurrency: false }, async () => {
+  test("renter endpoints allow a renter to read and update their profile", { concurrency: false }, async () => {
     const cookieJar = await harness.signIn(
-      customerFixture.email,
-      customerFixture.password,
+      renterFixture.email,
+      renterFixture.password,
     );
 
     const myProfile = await harness.graphql(
@@ -45,13 +45,13 @@ if (!runIntegrationTests) {
 
     assert.equal(myProfile.response.status, 200);
     assert.equal(myProfile.body.errors, undefined);
-    assert.equal(myProfile.body.data.myProfile.id, customerFixture.renterId);
-    assert.equal(myProfile.body.data.myProfile.user.email, customerFixture.email);
+    assert.equal(myProfile.body.data.myProfile.id, renterFixture.renterId);
+    assert.equal(myProfile.body.data.myProfile.user.email, renterFixture.email);
 
     const updateProfile = await harness.graphql(
       `
-        mutation UpdateCustomer($id: ID!, $input: CustomerUpdateInput!) {
-          updateCustomer(id: $id, input: $input) {
+        mutation UpdateRenter($id: ID!, $input: RenterUpdateInput!) {
+          updateRenter(id: $id, input: $input) {
             id
             user {
               name
@@ -60,9 +60,9 @@ if (!runIntegrationTests) {
         }
       `,
       {
-        id: customerFixture.renterId,
+        id: renterFixture.renterId,
         input: {
-          name: "customer-updated",
+          name: "renter-updated",
         },
       },
       cookieJar,
@@ -71,22 +71,22 @@ if (!runIntegrationTests) {
     assert.equal(updateProfile.response.status, 200);
     assert.equal(updateProfile.body.errors, undefined);
     assert.equal(
-      updateProfile.body.data.user.name,
-      "customer-updated",
+      updateProfile.body.data.updateRenter.user.name,
+      "renter-updated",
     );
   });
 
-  test("customer endpoints reject access to another customer's profile", { concurrency: false }, async () => {
+  test("renter endpoints reject access to another renter's profile", { concurrency: false }, async () => {
     const outsider = await harness.createFixtureUser("RENTER");
     const cookieJar = await harness.signIn(
-      customerFixture.email,
-      customerFixture.password,
+      renterFixture.email,
+      renterFixture.password,
     );
 
     const result = await harness.graphql(
       `
-        query Customer($id: ID!) {
-          customer(id: $id) {
+        query Renter($id: ID!) {
+          renter(id: $id) {
             id
           }
         }
