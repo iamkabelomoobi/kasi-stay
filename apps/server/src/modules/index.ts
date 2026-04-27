@@ -18,6 +18,8 @@ export * from "./roommates";
 export * from "./saved";
 export * from "./search";
 export * from "./sell";
+export * from "./services";
 export * from "./subscriptions";
+export * from "./tools";
 export * from "./user";
 export * from "./viewings";
