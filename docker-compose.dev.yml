@@ -45,11 +45,48 @@ services:
       timeout: 10s
       retries: 3
 
+  elasticsearch:
+    image: ${ELASTICSEARCH_IMAGE}
+    container_name: ${ELASTICSEARCH_CONTAINER_DEV}
+    restart: unless-stopped
+    ports:
+      - "${ELASTICSEARCH_PORT}:9200"
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    volumes:
+      - ${ELASTICSEARCH_VOLUME_DEV}:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+
+  kibana:
+    image: ${KIBANA_IMAGE}
+    container_name: ${KIBANA_CONTAINER_DEV}
+    restart: unless-stopped
+    ports:
+      - "${KIBANA_PORT}:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
 volumes:
   postgres_data_dev:
     name: ${POSTGRES_VOLUME_DEV}
   redis_data_dev:
     name: ${REDIS_VOLUME_DEV}
+  elasticsearch_data_dev:
+    name: ${ELASTICSEARCH_VOLUME_DEV}
 
 networks:
   default:
