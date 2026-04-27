@@ -6,6 +6,9 @@ import { logger } from "@kasistay/logger";
 
 let resendClient: Resend | null = null;
 let nodemailerClient: Transporter | null = null;
+let warnedAboutMailProvider = false;
+
+type MailProvider = "mailhog" | "resend";
 
 const requiredEnv = (name: string): string => {
   const value = process.env[name]?.trim();
@@ -44,6 +47,43 @@ const normalizeEnvelopeSender = (
 const logContext = (message: string, meta: Record<string, unknown>): string =>
   `${message} ${JSON.stringify(meta)}`;
 
+const getDefaultMailProvider = (): MailProvider =>
+  process.env.NODE_ENV?.trim().toLowerCase() === "production"
+    ? "resend"
+    : "mailhog";
+
+const resolveMailProvider = (): MailProvider => {
+  const configuredProvider = process.env.MAIL_PROVIDER?.trim().toLowerCase();
+
+  if (!configuredProvider) return getDefaultMailProvider();
+
+  if (configuredProvider === "mailhog" || configuredProvider === "mailog") {
+    return "mailhog";
+  }
+
+  if (configuredProvider === "resend") {
+    return "resend";
+  }
+
+  const fallbackProvider = getDefaultMailProvider();
+
+  if (!warnedAboutMailProvider) {
+    warnedAboutMailProvider = true;
+    logger.warn(
+      logContext(
+        "[email] Unsupported MAIL_PROVIDER; falling back to environment default",
+        {
+          configuredProvider,
+          fallbackProvider,
+          nodeEnv: process.env.NODE_ENV ?? "",
+        },
+      ),
+    );
+  }
+
+  return fallbackProvider;
+};
+
 export const getResendClient = (): Resend => {
   if (resendClient) return resendClient;
   resendClient = new Resend(requiredEnv("RESEND_API_KEY"));
@@ -71,7 +111,8 @@ export const getNodemailerClient = (): Transporter => {
 
 export const sendEmail = async (payload: EmailPayload): Promise<void> => {
   const recipients = Array.isArray(payload.to) ? payload.to : [payload.to];
-  const useMailhog = process.env.MAIL_PROVIDER === "mailhog";
+  const provider = resolveMailProvider();
+  const useMailhog = provider === "mailhog";
 
   if (useMailhog) {
     const client = getNodemailerClient();

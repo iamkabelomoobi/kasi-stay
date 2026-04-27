@@ -11,6 +11,7 @@ module.exports = {
       max_memory_restart: "1G",
       env: {
         NODE_ENV: "production",
+        MAIL_PROVIDER: "resend",
         PORT: 3000,
       },
       error_file: "./logs/err.log",

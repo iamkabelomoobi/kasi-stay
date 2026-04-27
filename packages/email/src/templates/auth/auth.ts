@@ -77,7 +77,7 @@ class AuthenticationTemplates {
   ): EmailPayload => {
     const { email, token, expiration, appName } = params;
 
-    const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${token}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
     const template: Mailgen.Content = {
       body: {
@@ -198,7 +198,7 @@ class AuthenticationTemplates {
           button: {
             color: "#DC2626",
             text: "Reset My Password",
-            link: `${process.env.FRONTEND_URL}/auth/forgot-password`,
+            link: `${process.env.FRONTEND_URL}/forgot-password`,
           },
         },
         outro: ["If you have any questions, please contact our support team."],
@@ -229,7 +229,7 @@ class AuthenticationTemplates {
           button: {
             color: "#4F46E5",
             text: "Get Started",
-            link: loginUrl ?? `${process.env.FRONTEND_URL}/auth/sign-in`,
+            link: loginUrl ?? `${process.env.FRONTEND_URL}/login`,
           },
         },
         outro: [
